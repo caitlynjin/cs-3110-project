@@ -3,5 +3,5 @@
 ## Group Members:
 - Caitlyn Jin (cj384)
 - Karen Sabile (ks2238)
-- <name> <netid>
+- Sophie Wang (szw3)
 - <name> <netid>
