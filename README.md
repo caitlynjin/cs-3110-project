@@ -2,6 +2,6 @@
 
 ## Group Members:
 - Caitlyn Jin (cj384)
-- <name> <netid>
+- Karen Sabile (ks2238)
 - <name> <netid>
 - <name> <netid>
