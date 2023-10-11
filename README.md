@@ -1,4 +1,4 @@
-# CS 3110 Project - (Name TBD)
+# CS 3110 Project - The Coolest Camls
 
 ## Group Members:
 - Caitlyn Jin (cj384)
