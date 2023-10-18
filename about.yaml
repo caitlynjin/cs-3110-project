@@ -1,0 +1,37 @@
+---
+# Members of your group.
+group:
+  - name: Caitlyn Jin
+    netid: cj384
+  - name: Karen Sabile
+    netid: ks2238
+  - name: Sophia Pan
+    netid: sp2225
+  - name: Sophie Wang
+    netid: szw3
+# Your PM.
+pm:
+  name: Zoe Berthol
+  netid: zmb27
+# Set to false if you don't want your gallery entry to be public.
+publish: false
+# Pithy title
+title: "___ (put y'all's idea here) Dish Dash Dilemma (DDD) Mealtime Madness (MM)"
+# OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
+git-repo: "https://github.com/caitlynjin/cs-3110-project"
+# If you have no demo screencast, replace the url string with an empty string ""
+demo-video-url: ""
+# Write a short, attention-grabbing description of your project.
+desc: >
+  Our project simulates the management of a restaurant through an interactive
+  game. The terminal shows a mock restaurant set-up made up of lines and different
+  symbols, and the player is able to perform different roles in the restaraunt such
+  as managing a waitlist, placing a group at a table, serving the customers,
+  cleaning the table, etc. Input is taken in from the terminal, and each
+  specified input will perform an action inside of the game. Our code is also
+  be able to compute if there exists a potential rearrangement of tables and
+  groups to accommodate for the user and its party for waitlisting. Every few
+  seconds, an updated visualization will be displayed and the user will be able
+  to repeat the process until the game is over. We are able to keep track of
+  the score based on time taken and other satisfaction factors, displaying
+  these on the end screen once the game ends.
