@@ -1,7 +1,7 @@
-# CS 3110 Project - (Name TBD)
+# CS 3110 Project - The Coolest Camls
 
 ## Group Members:
 - Caitlyn Jin (cj384)
 - Karen Sabile (ks2238)
 - Sophie Wang (szw3)
-- <name> <netid>
+- Sophia Pan (sp2225)
