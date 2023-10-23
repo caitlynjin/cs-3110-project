@@ -6,7 +6,7 @@ let rec read_int () =
 
 (* Given the width and height, prints a rectangle of that size with | and -. *)
 let create_restaurant width height =
-  for i = 1 to height do 
+  for i = 1 to height do
     for j = 1 to width do
       if (i = 1 || i = height) && (j = 1 || j = width) then print_char ' '
       else if i = 1 || i = height then print_char '-'
