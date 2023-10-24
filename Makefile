@@ -11,7 +11,7 @@ code:
 utop:
 	OCAMLRUNPARAM=b dune utop lib
 
-restaurant:
+start:
 	OCAMLRUNPARAM=b dune exec bin/setting.exe
 
 zip:
