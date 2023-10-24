@@ -1,7 +1,7 @@
-Ensure that you are in the correct directorym in terminal:
+Ensure that you are in the correct directory in terminal:
 cd cs-3110-project
 
-In terminal, type:
-make utop
+In terminal, use the following command to run the program:
+make start
 
-Follow the terminal prompts to create a restaurant.
+Answer the prompts to create a restaurant of your desired size.
