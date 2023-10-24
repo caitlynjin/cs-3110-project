@@ -4,6 +4,20 @@ let rec read_int () =
     print_endline "Invalid input. Please enter an integer.";
     read_int ()
 
+let rec read_key () =
+  print_string "Press the space bar to get the next party in line: ";
+  if read_line () = " " then
+    let party_size = Random.int 10 in
+    print_endline
+      ("Next in line is a party of " ^ string_of_int party_size ^ ".")
+  else
+    raise
+      (Failure
+         "Invalid input. Please enter a valid command. \n\
+          COMMANDS KEY:\n\
+         \    ' ' - Check the size of the next party in line.");
+  read_key ()
+
 (* Makes a 5 x 3 table (for 4 people each). n is the number of tables in the
    row. *)
 let create_table n =
@@ -29,17 +43,24 @@ let create_filled_restaurant num_tables =
   let border_string =
     String.cat (String.cat "|" (String.make (width - 2) ' ')) "|\n"
   in
-  for i = 1 to width do
+  for _ = 1 to width do
     print_char '-'
   done;
   print_newline ();
   print_string border_string;
-  for j = 1 to num_tables do
+
+  for _ = 1 to num_tables do
     create_table num_tables;
     print_string border_string;
     print_string border_string
   done;
-  for i = 1 to width do
+  let queue_length = Random.int 10 in
+  print_string "| \t";
+  for _ = 1 to queue_length do
+    print_char '*'
+  done;
+  print_newline ();
+  for _ = 1 to width do
     print_char '-'
   done;
   print_newline ()
@@ -47,4 +68,5 @@ let create_filled_restaurant num_tables =
 let () =
   print_string "Enter the number of tables: ";
   let num_tables = read_int () in
-  create_filled_restaurant num_tables
+  create_filled_restaurant num_tables;
+  read_key ()
