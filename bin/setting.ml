@@ -7,7 +7,7 @@ let rec read_int () =
 let rec read_key () =
   print_string "Press the space bar to get the next party in line: ";
   if read_line () = " " then
-    let party_size = Random.int 10 in
+    let party_size = 1 + Random.int 10 in
     print_endline
       ("Next in line is a party of " ^ string_of_int party_size ^ ".")
   else
@@ -54,7 +54,7 @@ let create_filled_restaurant num_tables =
     print_string border_string;
     print_string border_string
   done;
-  let queue_length = Random.int 10 in
+  let queue_length = 1 + Random.int 10 in
   print_string "| \t";
   for _ = 1 to queue_length do
     print_char '*'
