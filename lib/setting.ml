@@ -45,9 +45,6 @@ let create_filled_restaurant num_tables =
   print_newline ()
 
 let () =
-  (* print_string "Enter the width: "; let width = read_int () in print_string
-     "Enter the height: "; let height = read_int () in create_restaurant width
-     height; *)
   print_string "Enter the number of tables: ";
   let num_tables = read_int () in
   create_filled_restaurant num_tables
