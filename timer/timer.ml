@@ -1,10 +1,31 @@
-(* open Lwt *)
-
-(* open Lwt.Syntax *)
 open Lwt.Infix
 
-(* These are functions that were being tested. Look down below to see completed
-   functions. *)
+let rec countdown_from n () =
+  if n = 0 then Lwt.return_unit
+  else
+    Lwt_io.printf "Counting down from %d seconds...\n%!" n >>= fun () ->
+    Lwt_unix.sleep 1. >>= countdown_from (n - 1)
+
+(* let rec input_every_5_seconds () = countdown_from 5 () >>= fun () ->
+   Lwt_io.read_line_opt Lwt_io.stdin >>= function | Some _ -> Lwt_io.printf
+   "This is the restaurant being printed out.\n%!" >>= fun () ->
+   input_every_5_seconds () | None -> input_every_5_seconds () *)
+
+let rec print_every_5_seconds () =
+  countdown_from 5 () >>= fun () ->
+  Lwt_io.printf "This is the restaurant being printed out.\n%!" >>= fun () ->
+  Lwt_unix.sleep 1. >>= fun () -> print_every_5_seconds ()
+
+(* To run this file, type in the command [make timer]. *)
+let () =
+  Lwt_main.run
+    (* Replace [print_every_5_seconds] with [input_every_5_seconds] and vice
+       versa. *)
+    ( print_every_5_seconds () >>= fun input ->
+      Lwt_io.printf "You entered: %s\n" input )
+
+(* IGNORE THE FOLLOWING CODE. These are functions that were being tested. Look
+   above to see completed functions. *)
 
 (* let rec game_timer () = Lwt.bind (Lwt_unix.sleep 5.0) (fun () ->
    print_endline "5 seconds have passed in the game!"; game_timer ()) *)
@@ -44,29 +65,3 @@ open Lwt.Infix
 
    let () = Lwt_main.run (read_input () >>= fun input -> Lwt_io.printf "You
    entered: %s\n" input) *)
-
-(* Useable timer functions below. *)
-
-let rec countdown_from n () =
-  if n = 0 then Lwt.return_unit
-  else
-    Lwt_io.printf "Counting down from %d seconds...\n%!" n >>= fun () ->
-    Lwt_unix.sleep 1. >>= countdown_from (n - 1)
-
-(* let rec input_every_5_seconds () = countdown_from 5 () >>= fun () ->
-   Lwt_io.read_line_opt Lwt_io.stdin >>= function | Some _ -> Lwt_io.printf
-   "This is the restaurant being printed out.\n%!" >>= fun () ->
-   input_every_5_seconds () | None -> input_every_5_seconds () *)
-
-let rec print_every_5_seconds () =
-  countdown_from 5 () >>= fun () ->
-  Lwt_io.printf "This is the restaurant being printed out.\n%!" >>= fun () ->
-  Lwt_unix.sleep 1. >>= fun () -> print_every_5_seconds ()
-
-(* To run this file, type in the command [make timer]. *)
-let () =
-  Lwt_main.run
-    (* Replace [print_every_5_seconds] with [input_every_5_seconds] and vice
-       versa. *)
-    ( print_every_5_seconds () >>= fun input ->
-      Lwt_io.printf "You entered: %s\n" input )
