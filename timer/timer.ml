@@ -6,26 +6,41 @@ let rec countdown_from n () =
     Lwt_io.printf "Counting down from %d seconds...\n%!" n >>= fun () ->
     Lwt_unix.sleep 1. >>= countdown_from (n - 1)
 
-(* let rec input_every_5_seconds () = countdown_from 5 () >>= fun () ->
-   Lwt_io.read_line_opt Lwt_io.stdin >>= function | Some _ -> Lwt_io.printf
-   "This is the restaurant being printed out.\n%!" >>= fun () ->
-   input_every_5_seconds () | None -> input_every_5_seconds () *)
-
-let rec print_every_5_seconds () =
+let rec _input_every_5_seconds () =
   countdown_from 5 () >>= fun () ->
-  Lwt_io.printf "This is the restaurant being printed out.\n%!" >>= fun () ->
-  Lwt_unix.sleep 1. >>= fun () -> print_every_5_seconds ()
+  Lwt_io.read_line_opt Lwt_io.stdin >>= function
+  | Some input ->
+      if input = "exit" then Lwt.return ()
+      else
+        Lwt_io.printf "You entered: %s\n%!" input >>= fun () ->
+        Lwt_io.printf "This is the restaurant being printed out.\n%!"
+  | None -> _input_every_5_seconds ()
+
+let rec _run () =
+  Lwt.pick
+    [
+      _input_every_5_seconds ();
+      ( Lwt_unix.sleep 8. >>= fun () ->
+        Lwt_io.printf "Timeout\n%!" >>= fun () -> Lwt.return () );
+    ]
+  >>= _run
 
 (* To run this file, type in the command [make timer]. *)
 let () =
+  let game_duration = 20. in
+  let start_time = Unix.gettimeofday () in
   Lwt_main.run
-    (* Replace [print_every_5_seconds] with [input_every_5_seconds] and vice
-       versa. *)
-    ( print_every_5_seconds () >>= fun input ->
-      Lwt_io.printf "You entered: %s\n" input )
+    (Lwt.pick
+       [ _run (); (Lwt_unix.sleep game_duration >>= fun () -> Lwt.return ()) ]);
+  let end_time = Unix.gettimeofday () in
+  Printf.printf "Execution time: %fs\n%!" (end_time -. start_time)
 
 (* IGNORE THE FOLLOWING CODE. These are functions that were being tested. Look
    above to see completed functions. *)
+
+(* let rec _print_every_5_seconds () = countdown_from 5 () >>= fun () ->
+   Lwt_io.printf "This is the restaurant being printed out.\n%!" >>= fun () ->
+   Lwt_unix.sleep 1. >>= fun () -> _print_every_5_seconds () *)
 
 (* let rec game_timer () = Lwt.bind (Lwt_unix.sleep 5.0) (fun () ->
    print_endline "5 seconds have passed in the game!"; game_timer ()) *)
