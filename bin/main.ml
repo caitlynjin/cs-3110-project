@@ -31,6 +31,7 @@ let rec read_key () =
 (* Given the number of tables horizontally and vertically, prints a rectangle of
    that size with | and - with 5 x 3 size tables inside. [num_tables] represents
    the number of tables per row and and column of this square restaurant. *)
+   
 (* let create_filled_restaurant1 num_tables = let width = (5 * num_tables) + (3
    * (num_tables - 1)) + 8 in let border_string = String.cat (String.cat "|"
    (String.make (width - 2) ' ')) "|\n" in for _ = 1 to width do print_char '-'

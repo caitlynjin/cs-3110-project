@@ -1,4 +1,5 @@
 .PHONY: test check
+.PHONY: timer
 
 build:
 	dune build
@@ -13,6 +14,9 @@ utop:
 
 start:
 	OCAMLRUNPARAM=b dune exec bin/main.exe
+
+timer:
+	OCAMLRUNPARAM=b dune exec timer/timer.exe
 
 zip:
 	rm -f restaurant.zip
