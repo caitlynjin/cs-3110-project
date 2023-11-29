@@ -96,8 +96,8 @@ let _place_people_top_botton n table_id place_person row =
   else multiply_string (n - 1) " ---    " ^ " --- "
 
   (* pieces together above fxns and places into restaurant, dict = dict with table_ids as keys and int of people to seat *)
-  let generate_restaurant n arr =
-    restaurant := [|_table_top_bottom n|]
+  (* let generate_restaurant n dict =
+    restaurant := [|_table_top_bottom n|] *)
 
 (* generates the left and right edges of n tables, not including the spacing and
    | that represents the restaurant walls *)
@@ -153,7 +153,7 @@ let () =
   let num_tables = read_int () in
 
   (* create_filled_restaurant num_tables; *)
-  print_string "Enter the number of people: ";
+  print_string "Enter the table id: ";
   let num_people = read_int () in
   fill_row num_tables num_people;
   print_array !restaurant;
