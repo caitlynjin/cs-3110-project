@@ -1,4 +1,3 @@
 (executable
  (name main)
- (libraries lwt lwt.unix)
- (libraries Restaurant))
+ (libraries Restaurant lwt lwt.unix))
