@@ -13,7 +13,7 @@ utop:
 	OCAMLRUNPARAM=b dune utop lib
 
 start:
-	OCAMLRUNPARAM=b dune exec bin/setting.exe
+	OCAMLRUNPARAM=b dune exec bin/main.exe
 
 timer:
 	OCAMLRUNPARAM=b dune exec timer/timer.exe

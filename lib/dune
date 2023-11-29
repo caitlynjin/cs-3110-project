@@ -1,0 +1,3 @@
+(library
+ (name restaurant)
+ (public_name Restaurant))
