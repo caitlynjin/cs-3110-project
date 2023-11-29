@@ -2,7 +2,7 @@ module type Table = sig
   type t
 
   val make : int -> int -> t
-  val state : string
+  val state : t -> string
   val isReady : bool
   val party_size : t -> int
   val capacity : t -> int
@@ -14,10 +14,10 @@ module ReadyTable : Table = struct
     capacity : int;
   }
 
-  let make p c = { state = "Ready"; capacity = c }
-  let state = "Ready"
+  let make _ c = { state = "Ready"; capacity = c }
+  let state table = table.state
   let isReady = true
-  let party_size table = 0
+  let party_size _ = 0
   let capacity table = table.capacity
 end
 
@@ -29,7 +29,7 @@ module OccupiedTable : Table = struct
   }
 
   let make p c = { state = "Occupied"; party_size = p; capacity = c }
-  let state = "Occupied"
+  let state table = table.state
   let isReady = false
   let party_size table = table.party_size
   let capacity table = table.capacity
@@ -43,7 +43,7 @@ module DirtyTable : Table = struct
   }
 
   let make p c = { state = "Dirty"; party_size = p; capacity = c }
-  let state = "Dirty"
+  let state table = table.state
   let isReady = true
   let party_size table = table.party_size
   let capacity table = table.capacity

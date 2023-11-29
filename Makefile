@@ -12,7 +12,7 @@ utop:
 	OCAMLRUNPARAM=b dune utop lib
 
 start:
-	OCAMLRUNPARAM=b dune exec bin/setting.exe
+	OCAMLRUNPARAM=b dune exec bin/main.exe
 
 zip:
 	rm -f restaurant.zip
