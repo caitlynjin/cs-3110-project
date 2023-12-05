@@ -83,6 +83,33 @@ let create_filled_restaurant2 num_tables =
   done;
   ()
 
+(* Updates a row of n 5 x 3 tables (for 4 people each). n is the number of
+   tables in the row. table_id is which table the people will be placed at.
+   people is the number of people to be placed at the table. *)
+let fill_row n table_id =
+  let result = empty_restaurant 3 in
+  for i = 0 to 2 do
+    result.(i) <- ref (!result.(i) ^ "|   ");
+    for k = 1 to n do
+      let person = if k = table_id then "X" else " " in
+      for j = 1 to 5 do
+        if (i = 1 || i = 3) && (j = 1 || j = 5) then
+          result.(i - 1) := !result.(i - 1) ^ " "
+        else if i = 1 || i = 3 then result.(i - 1) := !result.(i - 1) ^ "-"
+        else if j = 1 || j = 5 then result.(i - 1) := !result.(i - 1) ^ "|"
+        else result.(i - 1) := !result.(i - 1) ^ " "
+          (* if you want to put food on the table, replace here^ *)
+      done;
+      if k < n then result.(i - 1) := !result.(i - 1) ^ " " ^ person ^ " "
+      else result.(i - 1) := !result.(i - 1) ^ "   | \n"
+    done
+    (* result.(i - 1) := !result.(i - 1) ^ "\t |" *)
+  done;
+  for i = 0 to Array.length result - 1 do
+    print_string (!(result.(i)) ^ "\n")
+  done;
+  ()
+
 let () =
   print_string "Enter the number of tables: ";
   let n = read_int () in
