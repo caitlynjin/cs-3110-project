@@ -7,17 +7,16 @@ let rec read_int () =
     read_int ()
 
 let rec read_key () =
-  print_string "Press the space bar to get the next party in line: ";
-  if read_line () = " " then
+  print_string
+    "Press the return bar to get the next party in line (Type \"exit\" to \
+     quit): ";
+  let input = read_line () in
+  if input = "" then
     let party_size = 1 + Random.int 10 in
     print_endline
       ("Next in line is a party of " ^ string_of_int party_size ^ ".")
-  else
-    raise
-      (Failure
-         "Invalid input. Please enter a valid command. \n\
-          COMMANDS KEY:\n\
-         \    ' ' - Check the size of the next party in line.");
+  else if input = "exit" then exit 0
+  else print_endline "Please press the return bar or type \"exit\" to quit. ";
   read_key ()
 
 (* Makes a 5 x 3 table (for 4 people each). n is the number of tables in the
