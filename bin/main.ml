@@ -6,18 +6,18 @@ let rec read_int () =
     print_endline "Invalid input. Please enter an integer.";
     read_int ()
 
+(* reads for if user wants to print next party in queue size *)
 let rec read_key () =
-  print_string "Press the space bar to get the next party in line: ";
-  if read_line () = " " then
+  print_string
+    "Press enter to get the next party in line (Type \"exit\" to quit): ";
+  let input = read_line () in
+  if input = "" then
+    (* TODO: call actual next queue party here *)
     let party_size = 1 + Random.int 10 in
     print_endline
       ("Next in line is a party of " ^ string_of_int party_size ^ ".")
-  else
-    raise
-      (Failure
-         "Invalid input. Please enter a valid command. \n\
-          COMMANDS KEY:\n\
-         \    ' ' - Check the size of the next party in line.");
+  else if input = "exit" then exit 0
+  else print_endline "Please press enter or type \"exit\" to quit. ";
   read_key ()
 
 (* Makes a 5 x 3 table (for 4 people each). n is the number of tables in the
@@ -31,6 +31,7 @@ let rec read_key () =
 (* Given the number of tables horizontally and vertically, prints a rectangle of
    that size with | and - with 5 x 3 size tables inside. [num_tables] represents
    the number of tables per row and and column of this square restaurant. *)
+
 (* let create_filled_restaurant1 num_tables = let width = (5 * num_tables) + (3
    * (num_tables - 1)) + 8 in let border_string = String.cat (String.cat "|"
    (String.make (width - 2) ' ')) "|\n" in for _ = 1 to width do print_char '-'
@@ -81,38 +82,26 @@ let create_filled_restaurant2 num_tables =
   for i = 0 to Array.length restaurant - 1 do
     print_string (!(restaurant.(i)) ^ "\n")
   done;
+  print_string "\n \n";
   ()
 
-(* Updates a row of n 5 x 3 tables (for 4 people each). n is the number of
-   tables in the row. table_id is which table the people will be placed at.
-   people is the number of people to be placed at the table. *)
-let fill_row n table_id =
-  let result = empty_restaurant 3 in
-  for i = 0 to 2 do
-    result.(i) <- ref (!result.(i) ^ "|   ");
-    for k = 1 to n do
-      let person = if k = table_id then "X" else " " in
-      for j = 1 to 5 do
-        if (i = 1 || i = 3) && (j = 1 || j = 5) then
-          result.(i - 1) := !result.(i - 1) ^ " "
-        else if i = 1 || i = 3 then result.(i - 1) := !result.(i - 1) ^ "-"
-        else if j = 1 || j = 5 then result.(i - 1) := !result.(i - 1) ^ "|"
-        else result.(i - 1) := !result.(i - 1) ^ " "
-          (* if you want to put food on the table, replace here^ *)
-      done;
-      if k < n then result.(i - 1) := !result.(i - 1) ^ " " ^ person ^ " "
-      else result.(i - 1) := !result.(i - 1) ^ "   | \n"
-    done
-    (* result.(i - 1) := !result.(i - 1) ^ "\t |" *)
-  done;
-  for i = 0 to Array.length result - 1 do
-    print_string (!(result.(i)) ^ "\n")
-  done;
-  ()
-
+(* running the game *)
 let () =
-  print_string "Enter the number of tables: ";
+  print_endline "Welcome to Dish Dash Dilemma!\n ";
+  print_endline
+    "In this game, you will be the host of a restaurant. \n\
+    \ You are in charge of seating customers and making sure they are happy. \n\
+    \ Let's see how well you do!";
+  print_endline
+    " \nTo start the game, press enter. Press any other key to exit. \n ";
+  let input = read_line () in
+  if input = "" then () else exit 0;
+  print_endline
+    "First, enter the number of tables for the width and the height of the \
+     restaurant: ";
   let n = read_int () in
   (* create_filled_restaurant1 n; *)
   create_filled_restaurant2 n;
   read_key ()
+
+(* print_endline "Thank you for playing Dish Dash Dilemma!";; *)
