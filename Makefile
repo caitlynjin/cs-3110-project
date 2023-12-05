@@ -18,6 +18,9 @@ start:
 timer:
 	OCAMLRUNPARAM=b dune exec timer/timer.exe
 
+test:
+	OCAMLRUNPARAM=b dune exec test/test.exe
+
 zip:
 	rm -f restaurant.zip
 	zip -r restaurant.zip . -x@exclude.lst

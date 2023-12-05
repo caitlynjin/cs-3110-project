@@ -16,20 +16,20 @@ let rec _input_every_5_seconds () =
         Lwt_io.printf "This is the restaurant being printed out.\n%!"
   | None -> _input_every_5_seconds ()
 
-let rec random_int () =
+let rec _random_int () =
   let x = Random.int 10 in
-  if x = 0 then random_int () else x
+  if x = 0 then _random_int () else x
 
-let create_start_queue (len : int) : int Queue.t =
+let _create_start_queue (len : int) : int Queue.t =
   let queue = Queue.create () in
-  for i = 0 to len do
-    Queue.add (random_int ()) queue
+  for _ = 0 to len do
+    Queue.add (_random_int ()) queue
   done;
   queue
 
-let get_next_party (q : int Queue.t) = Queue.take q
+let _get_next_party (q : int Queue.t) = Queue.take q
 
-let rec check_table (init : int) =
+let _check_table (init : int) =
   let new_duration = Random.int init in
   if new_duration = 0 then 0 else new_duration
 
@@ -47,7 +47,7 @@ let rec _run () =
 (* To run this file, type in the command [make timer]. *)
 let () =
   let game_duration = 20. in
-  let waitlist_queue = create_start_queue 10 in
+  (* let waitlist_queue = create_start_queue 10 in *)
   let start_time = Unix.gettimeofday () in
   Lwt_main.run
     (Lwt.pick
