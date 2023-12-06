@@ -1,50 +1,27 @@
-module type Table = sig
-  type t
+module Table = struct
+  type state =
+    | Occupied
+    | Ready
+    | Dirty
 
-  val make : int -> int -> t
-  val state : t -> string
-  val isReady : bool
-  val party_size : t -> int
-  val capacity : t -> int
-end
-
-module ReadyTable : Table = struct
   type t = {
-    state : string;
+    mutable current_state : state;
     capacity : int;
+    mutable party_size : int;
   }
 
-  let make _ c = { state = "Ready"; capacity = c }
-  let state table = table.state
-  let isReady = true
-  let party_size _ = 0
-  let capacity table = table.capacity
-end
+  let make c = { current_state = Ready; capacity = c; party_size = 0 }
+  let state table = table.current_state
+  let clean table = table.current_state <- Ready
 
-module OccupiedTable : Table = struct
-  type t = {
-    state : string;
-    party_size : int;
-    capacity : int;
-  }
+  let seat table p =
+    table.current_state <- Occupied;
+    table.party_size <- p
 
-  let make p c = { state = "Occupied"; party_size = p; capacity = c }
-  let state table = table.state
-  let isReady = false
-  let party_size table = table.party_size
-  let capacity table = table.capacity
-end
+  let finish table =
+    table.current_state <- Dirty;
+    table.party_size <- 0
 
-module DirtyTable : Table = struct
-  type t = {
-    state : string;
-    party_size : int;
-    capacity : int;
-  }
-
-  let make p c = { state = "Dirty"; party_size = p; capacity = c }
-  let state table = table.state
-  let isReady = true
   let party_size table = table.party_size
   let capacity table = table.capacity
 end

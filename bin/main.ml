@@ -1,5 +1,15 @@
 (* open Restaurant *)
 
+(* let restaurant_data = (int * Table.t * TableQueue.t) list *)
+let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))
+
+let keys : string =
+  "Here are valid commands for the game: \n\
+  \ - enter bar to get the size of the next party on queue \n\
+  \ - \"a\" to seat the next party in queue \n\
+  \ - \"help\" to see the valid key commands \n\
+  \ - \"exit\" to quit the game \n"
+
 let rec read_int () =
   try int_of_string (read_line ())
   with Failure _ ->
@@ -7,96 +17,114 @@ let rec read_int () =
     read_int ()
 
 let rec read_key () =
-  print_string "Press the space bar to get the next party in line: ";
-  if read_line () = " " then
+  (* TODO: edit these instructions *)
+  print_string "Insert a command here: ";
+  (* TODO: implement "a" to seat ppl *)
+  let input = read_line () in
+  if input = "" then
+    (* TODO: call actual next queue party here *)
     let party_size = 1 + Random.int 10 in
     print_endline
       ("Next in line is a party of " ^ string_of_int party_size ^ ".")
-  else
-    raise
-      (Failure
-         "Invalid input. Please enter a valid command. \n\
-          COMMANDS KEY:\n\
-         \    ' ' - Check the size of the next party in line.");
-  read_key ()
+    (* TODO: call read_key after re-printing key commands *)
+  else if input = "help" then
+    let _ = print_endline keys in
+    read_key ()
+  else if input = "exit" then exit 0
+  else (
+    print_endline "Please press enter or type \"exit\" to quit. ";
+    read_key ())
 
-(* Makes a 5 x 3 table (for 4 people each). n is the number of tables in the
-   row. *)
-(* let create_table n = for i = 1 to 3 do print_string "| "; for k = 1 to n do
-   for j = 1 to 5 do if (i = 1 || i = 3) && (j = 1 || j = 5) then print_char ' '
-   else if i = 1 || i = 3 then print_char '-' else if j = 1 || j = 5 then
-   print_char '|' else print_char ' ' done; if k < n then print_string " " else
-   print_string " | \n" done done *)
-
-(* Given the number of tables horizontally and vertically, prints a rectangle of
-   that size with | and - with 5 x 3 size tables inside. [num_tables] represents
-   the number of tables per row and and column of this square restaurant. *)
-(* let create_filled_restaurant1 num_tables = let width = (5 * num_tables) + (3
-   * (num_tables - 1)) + 8 in let border_string = String.cat (String.cat "|"
-   (String.make (width - 2) ' ')) "|\n" in for _ = 1 to width do print_char '-'
-   done; print_newline (); print_string border_string;
-
-   for _ = 1 to num_tables do create_table num_tables; print_string
-   border_string; print_string border_string done; let queue_length = 1 +
-   Random.int 10 in print_string "| \t"; for _ = 1 to queue_length do print_char
-   '*' done; print_newline (); for _ = 1 to width do print_char '-' done;
-   print_newline () *)
-
-(* Initializes array representation of restaurant to an empty string array of
-   length [size], where [size] represents the height of the restaurant. *)
-let empty_restaurant size = Array.make size (ref "")
-
-(* Concatenates the substring [s] to the empty string [length] times, returning
-   a string that is [length] characters long. Requires [s] to be of length 1. *)
-let generate_line length s =
-  let generate length acc =
-    for _ = 1 to length do
-      acc := !acc ^ s
-    done;
-    acc
-  in
-  generate length (ref "")
-
-(* Helper function to create rows for top and bottom edges of tables. *)
-let create_table_end row width =
-  row := "|   ";
-  for _ = 1 to width do
-    row := !row ^ " ---    "
+let generate_row row i1 i2 c =
+  for i = i1 to i2 do
+    row.(i) <- c
   done;
-  row := !row ^ "|"
+  if i1 <> 0 then (
+    row.(0) <- ref "|";
+    row.(i2) <- ref "|")
 
-(* Modifies string array produced by function [empty_restaurant] to contain [n]
-   by [n] restaurant layout with [n * n] tables, and prints restaurant after
-   updating array. For example, passing [4] to create_filled_restaurant will
-   produce a restaurant of 4 x 4 = 16 tables. Because each table is a 5 * 3
-   square, ach iteration of the while loop modifies five elements of the
-   restaurant array. *)
-let create_filled_restaurant2 n =
-  let length = (5 * n) + (3 * (n - 1)) + 8 in
-  let width = n * 5 in
-  let restaurant = empty_restaurant (width + 2) in
-  restaurant.(0) <- generate_line length "-";
+let create_table_end row width =
+  row.(0) <- ref "|";
+  for i = 1 to width - 2 do
+    if i mod 4 = 0 || i mod 3 = 0 then row.(i) <- ref " "
+    else row.(i) <- ref "-"
+  done;
+  row.(width - 1) <- ref "|"
+
+let table_middle_row row width =
+  row.(0) <- ref "|";
+  for i = 1 to width - 2 do
+    if i mod 4 = 0 || i mod 3 = 0 then row.(i) <- ref "|"
+    else row.(i) <- ref " "
+  done;
+  row.(width - 1) <- ref "|"
+
+(* fill_restaurant will modify the corresponding rows of table_id and place 'x's
+   around that table to represent the people in the party. [num_people] = the
+   number of x's to place around the table [table_id] = the table to place the
+   people at *)
+(* let fill_restaurant restaurant num_people table_id = failwith "naur" *)
+
+let display_filled_restaurant num_tables =
+  let width = (5 * num_tables) + (3 * (num_tables - 1)) + 8 in
+  let height = num_tables * 5 in
+  for n = 0 to height + 2 do
+    !restaurant_layout.(n) <- Array.make width (ref "")
+  done;
+  (* restaurant_layout.(0) <- ref "\n ~Dish Dash Dilemma!"; *)
+  generate_row !restaurant_layout.(0) 0 (width - 1) (ref "-");
   let i = ref 1 in
-  while !i < width do
-    restaurant.(!i) <- ref ("|" ^ !(generate_line (length - 2) " ") ^ "|");
-    create_table_end restaurant.(!i + 1) n;
-    restaurant.(!i + 2) <- ref ("| " ^ !(generate_line n "  |   | ") ^ "  |");
-    create_table_end restaurant.(!i + 3) n;
-    restaurant.(!i + 4) <- ref ("|" ^ !(generate_line (length - 2) " ") ^ "|");
+  while !i < height do
+    generate_row !restaurant_layout.(!i) 1 (width - 1) (ref " ");
+    create_table_end !restaurant_layout.(!i + 1) width;
+    table_middle_row !restaurant_layout.(!i + 2) width;
+    create_table_end !restaurant_layout.(!i + 3) width;
+    generate_row !restaurant_layout.(!i + 4) 1 (width - 2) (ref " ");
     i := !i + 5
   done;
-  restaurant.(Array.length restaurant - 1) <- generate_line length "-";
-  for i = 0 to Array.length restaurant - 1 do
-    print_string (!(restaurant.(i)) ^ "\n")
+  generate_row
+    !restaurant_layout.(Array.length !restaurant_layout - 1)
+    0 (width - 1) (ref "-");
+  for i = 0 to height - 1 do
+    for j = 1 to width - 1 do
+      print_string !(!restaurant_layout.(i).(j))
+    done;
+    print_string "\n"
   done;
-  ()
+  (* where print queue starts *)
+  for _ = 0 to Random.int 10 do
+    print_string "* "
+  done;
+  print_endline "\n"
 
-(* Main function to handle user input and output. Queries user for the number of
-   tables they would like their restaurant to contain along its length and
-   width. *)
+(* running the game *)
 let () =
-  print_string "Enter the number of tables: ";
-  let num_tables = read_int () in
-  (* create_filled_restaurant1 n; *)
-  create_filled_restaurant2 num_tables;
+  print_endline "Welcome to Dish Dash Dilemma!\n ";
+  print_endline
+    "In this game, you will be the host of a restaurant. \n\
+    \ You are in charge of seating customers and making sure they are happy. \n\
+    \ Let's see how well you do!";
+  print_endline
+    " \nTo start the game, press enter. Press any other key to exit. \n ";
+  let input = read_line () in
+  if input = "" then () else exit 0;
+  print_endline
+    "First, enter the number of tables for the width and the height of your \
+     restaurant: ";
+  let n = read_int () in
+  display_filled_restaurant n;
+  print_endline keys;
+  (* TODO: edit? this is based of game finishing when queue ends *)
+  (* print_endline "\n\ \ The objective of the game is to manage the restaurant.
+     \n\ \ You will be given a queue of parties waiting to be seated. \n\ \ You
+     must seat them in the restaurant. \n\ \ If you seat them at a table that is
+     too small, they will leave. \n\ \ If you seat them at a table that is too
+     big, they will leave. \n\ \ If you seat them at a table that is not ready,
+     they will leave. \n\ \ If you seat them at a table that is just right, they
+     will stay! \n\ \ You will be given a score based on how many parties you
+     seat. \n\ \ You will lose if you seat too many parties at the wrong table
+     size. \n\ \ You will win if you seat all the parties in the queue. \n\ \
+     Good luck! \n"; *)
   read_key ()
+
+(* print_endline "Thank you for playing Dish Dash Dilemma!";; *)
