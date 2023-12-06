@@ -1,16 +1,20 @@
 (* SETTING UP THE RESTAURANT: prompting player for the name of the restaurant,
-  cuisine, and menu. *)
+   cuisine, and menu. *)
 
-(* TODO: CALL THESE BEFORE ASKING PLAYER FOR TABLE SIZE ?? *)
+(* TODO: CALL THESE BEFORE ASKING PLAYER FOR TABLE SIZE *)
+
+(* default name in case player doesn't input one.. (like clicking enter w/o
+   typing anything) *)
+let restaurant_name = ref "Default Restaurant Name"
 
 (* dishes type *)
 type dish = {
   name : string;
   price : float;
-  ingredients : string list; (* TODO: ADD THIS ? make_time: int *)
+  ingredients : string list; (* can add a make_time : int here if we want *)
 }
 
-type menu = dish list
+(* type menu = dish list *)
 
 let cuisine = ref ""
 let restaurant_menu = ref []
@@ -24,8 +28,10 @@ let chinese_dishes_suggestions = "Dumplings, Fried Rice, Noodles, Soup, Tofu"
 let japanese_dishes_suggestions = "Sushi, Ramen, Udon, Tempura, Sashimi"
 let american_dishes_suggestions = "Burgers, Steaks, Sandwiches, Fries, Pizza"
 let italian_dishes_suggestions = "Pasta, Pizza, Risotto, Lasagna, Gnocchi"
+
 let indian_dishes_suggestions =
   "Curry, Naan, Samosas, Tandoori Chicken, Biryani"
+
 let korean_dishes_suggestions = "Bibimbap, Bulgogi, Kimchi, Tteokbokki, Japchae"
 
 (* pre-determined menus *)
@@ -214,10 +220,16 @@ let string_of_list lst =
   | [] -> ""
   | h :: t -> string_of_list_helper t h
 
-(* ADD STEP TO NAME THE RESTAURANT *)
+(* get input to name the restaurant *)
+let name_res () =
+  print_endline "What would you like to name your restaurant? ";
+  let input = read_line () in
+  restaurant_name := input;
+  print_endline ("\n Your restaurant is called " ^ input ^ "! \n")
+
 let rec read_key () =
   print_endline
-    ("Choose a type of cuisine for your restaurant, from these options: "
+    ("Next, choose a type of cuisine for your restaurant, from these options: "
     ^ string_of_list cuisine_list);
   print_endline "Or, type 'random' to get a random cuisine.";
   let input = read_line () in
@@ -227,19 +239,31 @@ let rec read_key () =
     || input = "Indian" || input = "Japanese" || input = "Korean"
   then begin
     cuisine := input;
-    print_endline (cuisine_announcement ^ !cuisine ^ ".")
+    print_endline (cuisine_announcement ^ !cuisine ^ ". \n")
   end
-  else if input = "random" then begin
+  else if input = "random" || input = "exit" then begin
     let random_cuisine =
       List.nth cuisine_list (Random.int (List.length cuisine_list))
     in
     cuisine := random_cuisine;
     print_endline (cuisine_announcement ^ !cuisine ^ ".")
   end
-  else if input = "exit" then exit 0
-  else print_endline "Please enter a valid cuisine style, or type \"exit\" to quit. ";
-  (* TODO: if exits before choosing a cuisine, set a random one *)
-  read_key ()
+  else begin
+    print_endline
+      "Please enter a valid cuisine style, or type \"exit\" to quit. ";
+    read_key ()
+  end
+
+(* if a player wants ideas for what dishes to put, returns a list of possible
+   dishes for their chosen cuisine *)
+let suggest_menus cuisine =
+  if cuisine = "Chinese" then chinese_dishes_suggestions
+  else if cuisine = "Japanese" then japanese_dishes_suggestions
+  else if cuisine = "American" then american_dishes_suggestions
+  else if cuisine = "Italian" then italian_dishes_suggestions
+  else if cuisine = "Indian" then indian_dishes_suggestions
+  else if cuisine = "Korean" then korean_dishes_suggestions
+  else failwith "Invalid cuisine"
 
 (* if player wants a pre-determined menu, set it based on the cuisine they have
    chosen. *)
@@ -253,7 +277,7 @@ let set_menu input =
   else failwith "Invalid cuisine"
 
 (* adds dish to menu *)
-let rec make_dish dName dPrice dIngredients =
+let make_dish dName dPrice dIngredients =
   restaurant_menu :=
     { name = dName; price = dPrice; ingredients = dIngredients }
     :: !restaurant_menu
@@ -261,7 +285,7 @@ let rec make_dish dName dPrice dIngredients =
 (* turns menu into a string *)
 let rec menu_to_string menu =
   let dish_to_string dish =
-    dish.name ^ ": $" ^ string_of_float dish.price ^ "\n ingredients: "
+    dish.name ^ ": $" ^ string_of_float dish.price ^ "\ningredients: "
     ^ string_of_list dish.ingredients
     ^ "\n"
   in
@@ -269,17 +293,32 @@ let rec menu_to_string menu =
   | [] -> ""
   | h :: t -> dish_to_string h ^ menu_to_string t
 
-(* prompts player to make their own menu, or select from the pre-determined menus. *)
+(* prompts player to make their own menu, or select from the pre-determined
+   menus. *)
 let rec make_menu () =
   let input = read_line () in
-  if input = "standard" then begin
-    restaurant_menu := set_menu !cuisine;
-    print_endline
-      ("The menu for your " ^ !cuisine ^ " restaurant is: \n"
-      ^ string_of_list (List.map (fun x -> x.name) !restaurant_menu)
-      ^ ".")
+  if input = "standard" then begin restaurant_menu := set_menu !cuisine
+    (* print_endline ("The menu for your " ^ !cuisine ^ " restaurant is: \n" ^
+       string_of_list (List.map (fun x -> x.name) !restaurant_menu) ^ ".") *)
   end
-  else if input = "done" then exit 0
+  else if input = "suggest" then begin
+    print_endline
+      ("Here are some suggestions for dishes to add to your menu: \n"
+     ^ suggest_menus !cuisine
+     ^ "\n\
+       \ Please enter another dish you want to include on your menu, or type \
+        'done' if you finished making your menu. ");
+    make_menu ()
+  end
+  else if input = "done" then begin
+    if !restaurant_menu = [] then begin
+      restaurant_menu := set_menu !cuisine;
+      print_endline
+        ("The menu for your " ^ !cuisine ^ " restaurant is: \n"
+        ^ string_of_list (List.map (fun x -> x.name) !restaurant_menu)
+        ^ ".")
+    end
+  end
   else
     let dish_name = input in
     print_string "What is the price of this dish? ";
@@ -294,11 +333,14 @@ let rec make_menu () =
 
 let () =
   print_endline "Let's set up our restaurant!";
-  (* read_key () *)
+  name_res ();
+  read_key ();
   print_endline
     "Now, let's make the menu! What dishes do you want to serve?\n\
     \   \n\
-    \  Or, type 'standard' to get a pre-determined menu. \n";
-  (* read_menu (); *)
-  print_endline "Your menu is: \n" ^ menu_to_string !restaurant_menu ^ ".";
+    \  Or, type 'suggest' to see some suggestions of dishes to add, or \
+     'standard' to get a pre-determined menu. \n";
+  make_menu ();
+  let menu_str = menu_to_string !restaurant_menu in
+  print_endline ("Your menu is: \n" ^ menu_str ^ "\n");
   print_endline "Now, let's open the restaurant! \n"

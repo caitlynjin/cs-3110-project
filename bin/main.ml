@@ -16,7 +16,9 @@ let rec read_key () =
     let party_size = 1 + Random.int 10 in
     print_endline
       ("Next in line is a party of " ^ string_of_int party_size ^ ".")
-  else if input = "exit" then exit 0
+  else if input = "exit" then begin
+    ()
+  end
   else print_endline "Please press enter or type \"exit\" to quit. ";
   read_key ()
 
