@@ -21,6 +21,18 @@ let height = ref 0
 
 (* prints out the table list such that "table #'s coordinates are (#,
    #)(#,#)..." *)
+let _print_list () =
+  let print_coord acc (h, w) =
+    acc ^ "(" ^ string_of_int h ^ ", " ^ string_of_int w ^ ")"
+  in
+  let print_coord_list lst = List.fold_left print_coord "" lst in
+  let print_entry (id, table) =
+    print_string
+      ("table " ^ string_of_int id ^ "'s coordinates are "
+      ^ print_coord_list (Table.coord_list table)
+      ^ "\n")
+  in
+  List.iter print_entry !table_list
 
 let keys : string =
   "\n\
@@ -167,7 +179,7 @@ let make_restaurant num_tables =
    around that table to represent the people in the party. [num_people] = the
    number of x's to place around the table [table_id] = the table to place the
    people at *)
-let fill_restaurant num_people table_id =
+let _fill_restaurant num_people table_id =
   if num_people > Table.capacity (get_table table_id) then
     failwith "too much people"
   else (
@@ -206,6 +218,13 @@ let setup_num_tables () =
      restaurant: ";
   make_restaurant (read_int ());
   display_filled_restaurant ();
+
+  (* just for testing purposes *)
+  (* fill_restaurant 4 1; display_filled_restaurant (); fill_restaurant 3 5;
+     display_filled_restaurant (); *)
+
+  (* just for testing purposes *)
+  (* print_list (); *)
   Lwt.return ()
 
 (* running the game *)
