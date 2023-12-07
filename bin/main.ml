@@ -117,6 +117,14 @@ let display_filled_restaurant num_tables =
    0 to Array.length restaurant - 1 do print_string (!(restaurant.(i)) ^ "\n")
    done; print_string "\n \n"; () *)
 
+let setup_num_tables () =
+  print_endline
+    "First, enter the number of tables for the width and the height of the \
+     restaurant: ";
+  let n = read_int () in
+  display_filled_restaurant n;
+  Lwt.return ()
+
 (* running the game *)
 let () =
   Lwt_main.run
@@ -135,12 +143,8 @@ let () =
       >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () ->
       read_enter () >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () -> Menus.set_up_restaurant () );
-  print_endline
-    "First, enter the number of tables for the width and the height of the \
-     restaurant: ";
-  let n = read_int () in
-  display_filled_restaurant n;
+      Lwt_unix.sleep 2. >>= fun () ->
+      Menus.set_up_restaurant () >>= fun () -> setup_num_tables () );
   print_endline keys;
   (* TODO: edit? this is based of game finishing when queue ends *)
   (* print_endline "\n\ \ The objective of the game is to manage the restaurant.
