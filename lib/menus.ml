@@ -119,7 +119,7 @@ let american_set_menu =
     {
       name = "Pizza";
       price = 10.99;
-      ingredients = [ "Dough"; "Sauce"; "Vegetables" ];
+      ingredients = [ "Dough"; "Sauce"; "Meat"; "Vegetables" ];
     };
   ]
 
@@ -289,7 +289,7 @@ let make_dish dName dPrice dIngredients =
 (* turns menu into a string *)
 let rec menu_to_string menu =
   let dish_to_string dish =
-    dish.name ^ ": $" ^ string_of_float dish.price ^ "\ningredients: "
+    dish.name ^ ": $" ^ string_of_float dish.price ^ "\n    ingredients: "
     ^ string_of_list dish.ingredients
     ^ "\n"
   in
@@ -351,6 +351,6 @@ let set_up_restaurant () =
   >>= fun () ->
   make_menu () >>= fun () ->
   let menu_str = menu_to_string !restaurant_menu in
-  print_endline ("Your menu is: \n" ^ menu_str ^ "\n");
+  print_endline ("\nYour menu is: \n" ^ menu_str ^ "\n");
   print_endline "Now, let's open the restaurant! \n";
   Lwt.return ()
