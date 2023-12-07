@@ -17,21 +17,15 @@ let height = ref 0
 
 (* prints out the table list such that "table #'s coordinates are (#,
    #)(#,#)..." *)
-let print_list () =
-  let print_coord acc (h, w) =
-    acc ^ "(" ^ string_of_int h ^ ", " ^ string_of_int w ^ ")"
-  in
-  let print_coord_list lst = List.fold_left print_coord "" lst in
-  let print_entry (id, table) =
-    print_string
-      ("table " ^ string_of_int id ^ "'s coordinates are "
-      ^ print_coord_list (ReadyTable.coord_list table)
-      ^ "\n")
-  in
-  List.iter print_entry !table_list
+(* let print_list () = let print_coord acc (h, w) = acc ^ "(" ^ string_of_int h
+   ^ ", " ^ string_of_int w ^ ")" in let print_coord_list lst = List.fold_left
+   print_coord "" lst in let print_entry (id, table) = print_string ("table " ^
+   string_of_int id ^ "'s coordinates are " ^ print_coord_list
+   (ReadyTable.coord_list table) ^ "\n") in List.iter print_entry !table_list *)
 
 let keys : string =
-  "\n Here are valid commands for the game: \n\
+  "\n\
+  \ Here are valid commands for the game: \n\
   \ - enter bar to get the size of the next party on queue \n\
   \ - \"a\" to seat the next party in queue \n\
   \ - \"help\" to see the valid key commands \n\
@@ -209,7 +203,7 @@ let setup_num_tables () =
      restaurant: ";
   make_restaurant (read_int ());
   display_filled_restaurant ();
-  print_list ();
+  (* print_list (); *)
   Lwt.return ()
 
 (* running the game *)
@@ -255,7 +249,8 @@ let () =
         \  You will lose if you seat too many parties at the wrong table size. \n\
         \  You will win if you seat all the parties in the queue. \n\
         \ Good luck! \n"
-      >>= fun () -> setup_num_tables () );
+      >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () -> setup_num_tables () );
   print_endline keys;
   read_key ();
 
