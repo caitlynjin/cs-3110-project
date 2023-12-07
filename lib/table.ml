@@ -11,6 +11,47 @@ module type Table = sig
   val add_list : t -> int -> int -> unit
 end
 
+module Table = struct
+  type state =
+    | Occupied
+    | Ready
+    | Dirty
+
+  type t = {
+    mutable current_state : state;
+    capacity : int;
+    coord_list : (int * int) list ref;
+    mutable party_size : int;
+  }
+
+  let make _ c =
+    { current_state = Ready; capacity = c; party_size = 0; coord_list = ref [] }
+
+  let make_with_coord p c lst =
+    {
+      current_state = Ready;
+      party_size = p;
+      capacity = c;
+      coord_list = ref lst;
+    }
+
+  let state table = table.current_state
+  let clean table = table.current_state <- Ready
+
+  let seat table p =
+    table.current_state <- Occupied;
+    table.party_size <- p
+
+  let finish table =
+    table.current_state <- Dirty;
+    table.party_size <- 0
+
+  let party_size table = table.party_size
+  let capacity table = table.capacity
+  let coord_list table = !(table.coord_list)
+  let add_list table x y = table.coord_list := (x, y) :: !(table.coord_list)
+end
+
 module ReadyTable : Table = struct
   type t = {
     state : string;
@@ -68,7 +109,6 @@ module DirtyTable : Table = struct
 
   let make_with_coord p c lst =
     { state = "Occupied"; party_size = p; capacity = c; coord_list = ref lst }
-    
 
   (* let set_list table lst = table.coord_list = lst *)
   let state table = table.state
