@@ -240,8 +240,8 @@ let rec read_key () =
     ("Next, choose a type of cuisine for your restaurant, from these options: "
     ^ string_of_list cuisine_list)
   >>= fun () ->
-  Lwt_unix.sleep 1. >>= fun () ->
   Lwt_io.printl "Or, type 'random' to get a random cuisine." >>= fun () ->
+  Lwt_unix.sleep 1. >>= fun () ->
   let input = read_line () in
   let cuisine_announcement = "\nThe cuisine style of your restaurant is " in
   if
@@ -320,7 +320,7 @@ let rec make_menu () =
       ("Here are some suggestions for dishes to add to your menu: \n"
      ^ suggest_menus !cuisine
      ^ "\n\
-       \ Please enter another dish you want to include on your menu, or type \
+       \ Please enter a dish you want to include on your menu, or type \
         'done' if you finished making your menu. ");
     make_menu ()
   end
@@ -356,15 +356,15 @@ let set_up_restaurant () =
   Lwt_unix.sleep 2. >>= fun () ->
   Lwt_io.printl "Now, let's make the menu! What dishes do you want to serve?"
   >>= fun () ->
-  Lwt_unix.sleep 1. >>= fun () ->
   Lwt_io.printl
     "  Or, type 'suggest' to see some suggestions of dishes to add, or \
-     'standard' to get a pre-determined menu. \n"
+     'standard' to use a pre-determined menu. \n"
   >>= fun () ->
+  Lwt_unix.sleep 1. >>= fun () ->
   make_menu () >>= fun () ->
   Lwt_unix.sleep 2. >>= fun () ->
   let menu_str = menu_to_string !restaurant_menu in
-  Lwt_io.printl "\nYour menu is:" >>= fun () ->
+  Lwt_io.printl "\nYour full menu is:" >>= fun () ->
   Lwt_unix.sleep 1. >>= fun () ->
   Lwt_io.printl menu_str >>= fun () ->
   Lwt_unix.sleep 2. >>= fun () ->
