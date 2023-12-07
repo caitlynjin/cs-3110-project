@@ -21,21 +21,10 @@ let height = ref 0
 
 (* prints out the table list such that "table #'s coordinates are (#,
    #)(#,#)..." *)
-let print_list () =
-  let print_coord acc (h, w) =
-    acc ^ "(" ^ string_of_int h ^ ", " ^ string_of_int w ^ ")"
-  in
-  let print_coord_list lst = List.fold_left print_coord "" lst in
-  let print_entry (id, table) =
-    print_string
-      ("table " ^ string_of_int id ^ "'s coordinates are "
-      ^ print_coord_list (Table.coord_list table)
-      ^ "\n")
-  in
-  List.iter print_entry !table_list
 
 let keys : string =
-  "Here are valid commands for the game: \n\
+  "\n\
+  \ Here are valid commands for the game: \n\
   \ - enter bar to get the size of the next party on queue \n\
   \ - \"a\" to seat the next party in queue \n\
   \ - \"help\" to see the valid key commands \n\
@@ -217,15 +206,6 @@ let setup_num_tables () =
      restaurant: ";
   make_restaurant (read_int ());
   display_filled_restaurant ();
-
-  (* just for testing purposes *)
-    (* fill_restaurant 4 1;
-    display_filled_restaurant ();
-    fill_restaurant 3 5;
-    display_filled_restaurant (); *)
-
-  (* just for testing purposes *)
-    (* print_list (); *)
   Lwt.return ()
 
 (* running the game *)
@@ -247,19 +227,33 @@ let () =
       Lwt_unix.sleep 2. >>= fun () ->
       read_enter () >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () ->
-      Menus.set_up_restaurant () >>= fun () -> setup_num_tables () );
+      Menus.set_up_restaurant () >>= fun () ->
+      Lwt_io.printl "\n  The objective of the game is to manage the restaurant."
+      >>= fun () ->
+      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_io.printl
+        "\n\
+         You will be given a queue of parties waiting to be seated. \n\
+        \  You must seat them in the restaurant."
+      >>= fun () ->
+      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_io.printl
+        "\n\
+         If you seat them at a table that is too small, they will leave. \n\
+        \  If you seat them at a table that is too big, they will leave. \n\
+        \  If you seat them at a table that is not ready, they will leave. \n\
+        \  If you seat them at a table that is just right, they will stay!"
+      >>= fun () ->
+      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_io.printl
+        "\n\
+         You will be given a score based on how many parties you seat. \n\
+        \  You will lose if you seat too many parties at the wrong table size. \n\
+        \  You will win if you seat all the parties in the queue. \n\
+        \ Good luck! \n"
+      >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () -> setup_num_tables () );
   print_endline keys;
-  (* TODO: edit? this is based of game finishing when queue ends *)
-  (* print_endline "\n\ \ The objective of the game is to manage the restaurant.
-     \n\ \ You will be given a queue of parties waiting to be seated. \n\ \ You
-     must seat them in the restaurant. \n\ \ If you seat them at a table that is
-     too small, they will leave. \n\ \ If you seat them at a table that is too
-     big, they will leave. \n\ \ If you seat them at a table that is not ready,
-     they will leave. \n\ \ If you seat them at a table that is just right, they
-     will stay! \n\ \ You will be given a score based on how many parties you
-     seat. \n\ \ You will lose if you seat too many parties at the wrong table
-     size. \n\ \ You will win if you seat all the parties in the queue. \n\ \
-     Good luck! \n"; *)
   read_key ();
 
   print_endline "Thank you for playing Dish Dash Dilemma!"
