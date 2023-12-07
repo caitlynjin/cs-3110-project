@@ -128,8 +128,8 @@ let setup_num_tables () =
 (* running the game *)
 let () =
   Lwt_main.run
-    ( Lwt_unix.sleep 2. >>= fun () ->
-      Lwt_io.printl "Welcome to Dish Dash Dilemma!\n " >>= fun () ->
+    ( Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_io.printl "\nWelcome to Dish Dash Dilemma!\n " >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () ->
       Lwt_io.printl
         "In this game, you will be the host of a restaurant. \n\
