@@ -44,7 +44,7 @@ let read_enter () =
 (* let empty_restaurant size = Array.make size (ref "") *)
 
 let generate_row row i1 i2 c =
-  for i = i1 to i2 do
+  for i = i1 to (i2 -1) do
     row.(i) <- c
   done;
   if i1 <> 0 then (
@@ -52,19 +52,47 @@ let generate_row row i1 i2 c =
     row.(i2) <- ref "|")
 
 let create_table_end row width =
-  row.(0) <- ref "|";
-  for i = 1 to width - 2 do
-    if i mod 4 = 0 || i mod 3 = 0 then row.(i) <- ref " "
-    else row.(i) <- ref "-"
+  row.(0) <- ref "|";  
+  row.(1) <- ref " ";
+  row.(2) <- ref " ";
+  row.(3) <- ref " ";
+
+  let i = ref 4 in
+  while !i < width - 8 do
+    row.(!i) <- ref " ";
+    row.(!i + 1) <- ref "-";
+    row.(!i + 2) <- ref "-";
+    row.(!i + 3) <- ref "-";
+    row.(!i + 4) <- ref " ";
+    row.(!i + 5) <- ref " ";
+    row.(!i + 6) <- ref " ";
+    row.(!i + 7) <- ref " ";
+    i := !i + 8
   done;
+  
   row.(width - 1) <- ref "|"
 
+(* creates the middle row of the table (the |   | of each table) *)
 let table_middle_row row width =
+  (* sets the left border of the row  *)
   row.(0) <- ref "|";
-  for i = 1 to width - 2 do
-    if i mod 4 = 0 || i mod 3 = 0 then row.(i) <- ref "|"
-    else row.(i) <- ref " "
+  row.(1) <- ref " ";
+  (* manually does the |    | thing  *)
+  let i = ref 2 in
+  while !i < width - 8 do
+    row.(!i) <- ref " ";
+    row.(!i + 1) <- ref " ";
+    row.(!i + 2) <- ref "|";
+    row.(!i + 3) <- ref " ";
+    row.(!i + 4) <- ref " ";
+    row.(!i + 5) <- ref " ";
+    row.(!i + 6) <- ref "|";
+    row.(!i + 7) <- ref " ";
+    i := !i + 8
   done;
+  (* sets the right border of the row  *)
+  row.(width - 3) <- ref " ";
+  row.(width - 2) <- ref " ";
   row.(width - 1) <- ref "|"
 
 (* fill_restaurant will modify the corresponding rows of table_id and place 'x's
@@ -75,26 +103,33 @@ let table_middle_row row width =
 
 let display_filled_restaurant num_tables =
   let width = (5 * num_tables) + (3 * (num_tables - 1)) + 8 in
-  let height = num_tables * 5 in
-  for n = 0 to height + 2 do
+  let height = num_tables * 5 + 2 in
+
+  restaurant_layout := Array.make (height) (Array.make width (ref ""));
+
+  for n = 0 to height - 2 do
     !restaurant_layout.(n) <- Array.make width (ref "")
   done;
   (* restaurant_layout.(0) <- ref "\n ~Dish Dash Dilemma!"; *)
-  generate_row !restaurant_layout.(0) 0 (width - 1) (ref "-");
+  
+  (* first sets the first row of the array to just "-" *)
+  generate_row !restaurant_layout.(0) 0 width (ref "-");
   let i = ref 1 in
-  while !i < height do
+  while !i < (height - 2) do
     generate_row !restaurant_layout.(!i) 1 (width - 1) (ref " ");
     create_table_end !restaurant_layout.(!i + 1) width;
     table_middle_row !restaurant_layout.(!i + 2) width;
     create_table_end !restaurant_layout.(!i + 3) width;
-    generate_row !restaurant_layout.(!i + 4) 1 (width - 2) (ref " ");
+    generate_row !restaurant_layout.(!i + 4) 1 (width - 1) (ref " ");
     i := !i + 5
   done;
-  generate_row
-    !restaurant_layout.(Array.length !restaurant_layout - 1)
-    0 (width - 1) (ref "-");
+  (* sets the next to last row to an empty row and the final row of the array to just "-" *)
+  generate_row !restaurant_layout.(height- 2) 1 (width - 1) (ref " ");
+  generate_row !restaurant_layout.(height - 1 ) 0 width (ref "-");
+
+  (* prints everything out *)
   for i = 0 to height - 1 do
-    for j = 1 to width - 1 do
+    for j = 0 to width - 1 do
       print_string !(!restaurant_layout.(i).(j))
     done;
     print_string "\n"
