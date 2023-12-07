@@ -1,4 +1,5 @@
-(* open Restaurant *)
+open Lwt.Infix
+open Restaurant
 
 let rec read_int () =
   try int_of_string (read_line ())
@@ -21,6 +22,11 @@ let rec read_key () =
   end
   else print_endline "Please press enter or type \"exit\" to quit. ";
   read_key ()
+
+let read_enter () =
+  Lwt_io.read_line_opt Lwt_io.stdin >>= function
+  | Some input -> if input = "" then Lwt.return () else exit 0
+  | None -> exit 0
 
 (* Makes a 5 x 3 table (for 4 people each). n is the number of tables in the
    row. *)
@@ -89,15 +95,23 @@ let create_filled_restaurant2 num_tables =
 
 (* running the game *)
 let () =
-  print_endline "Welcome to Dish Dash Dilemma!\n ";
-  print_endline
-    "In this game, you will be the host of a restaurant. \n\
-    \ You are in charge of seating customers and making sure they are happy. \n\
-    \ Let's see how well you do!";
-  print_endline
-    " \nTo start the game, press enter. Press any other key to exit. \n ";
-  let input = read_line () in
-  if input = "" then () else exit 0;
+  Lwt_main.run
+    ( Lwt_unix.sleep 2. >>= fun () ->
+      Lwt_io.printl "Welcome to Dish Dash Dilemma!\n " >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () ->
+      Lwt_io.printl
+        "In this game, you will be the host of a restaurant. \n\
+        \ You are in charge of seating customers and making sure they are \
+         happy. \n\
+        \ Let's see how well you do!"
+      >>= fun () ->
+      Lwt_unix.sleep 4. >>= fun () ->
+      Lwt_io.printl
+        " \nTo start the game, press enter. Press any other key to exit. \n "
+      >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () ->
+      read_enter () >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () -> Menus.set_up_restaurant () );
   print_endline
     "First, enter the number of tables for the width and the height of the \
      restaurant: ";

@@ -1,3 +1,4 @@
+open Lwt.Infix
 (* SETTING UP THE RESTAURANT: prompting player for the name of the restaurant,
    cuisine, and menu. *)
 
@@ -225,7 +226,8 @@ let name_res () =
   print_endline "What would you like to name your restaurant? ";
   let input = read_line () in
   restaurant_name := input;
-  print_endline ("\n Your restaurant is called " ^ input ^ "! \n")
+  print_endline ("\n Your restaurant is called " ^ input ^ "! \n");
+  Lwt.return ()
 
 let rec read_key () =
   print_endline
@@ -239,14 +241,16 @@ let rec read_key () =
     || input = "Indian" || input = "Japanese" || input = "Korean"
   then begin
     cuisine := input;
-    print_endline (cuisine_announcement ^ !cuisine ^ ". \n")
+    print_endline (cuisine_announcement ^ !cuisine ^ ". \n");
+    Lwt.return ()
   end
   else if input = "random" || input = "exit" then begin
     let random_cuisine =
       List.nth cuisine_list (Random.int (List.length cuisine_list))
     in
     cuisine := random_cuisine;
-    print_endline (cuisine_announcement ^ !cuisine ^ ".")
+    print_endline (cuisine_announcement ^ !cuisine ^ ".");
+    Lwt.return ()
   end
   else begin
     print_endline
@@ -297,9 +301,11 @@ let rec menu_to_string menu =
    menus. *)
 let rec make_menu () =
   let input = read_line () in
-  if input = "standard" then begin restaurant_menu := set_menu !cuisine
+  if input = "standard" then begin
+    restaurant_menu := set_menu !cuisine
     (* print_endline ("The menu for your " ^ !cuisine ^ " restaurant is: \n" ^
-       string_of_list (List.map (fun x -> x.name) !restaurant_menu) ^ ".") *)
+       string_of_list (List.map (fun x -> x.name) !restaurant_menu) ^ ".") *);
+    Lwt.return ()
   end
   else if input = "suggest" then begin
     print_endline
@@ -316,8 +322,10 @@ let rec make_menu () =
       print_endline
         ("The menu for your " ^ !cuisine ^ " restaurant is: \n"
         ^ string_of_list (List.map (fun x -> x.name) !restaurant_menu)
-        ^ ".")
+        ^ ".");
+      Lwt.return ()
     end
+    else Lwt.return ()
   end
   else
     let dish_name = input in
@@ -331,16 +339,18 @@ let rec make_menu () =
        'done' if you finished making your menu. ";
     make_menu ()
 
-let () =
-  print_endline "Let's set up our restaurant!";
-  name_res ();
-  read_key ();
-  print_endline
+let set_up_restaurant () =
+  Lwt_io.printl "Let's set up our restaurant!" >>= fun () ->
+  name_res () >>= fun () ->
+  read_key () >>= fun () ->
+  Lwt_io.printl
     "Now, let's make the menu! What dishes do you want to serve?\n\
     \   \n\
     \  Or, type 'suggest' to see some suggestions of dishes to add, or \
-     'standard' to get a pre-determined menu. \n";
-  make_menu ();
+     'standard' to get a pre-determined menu. \n"
+  >>= fun () ->
+  make_menu () >>= fun () ->
   let menu_str = menu_to_string !restaurant_menu in
   print_endline ("Your menu is: \n" ^ menu_str ^ "\n");
-  print_endline "Now, let's open the restaurant! \n"
+  print_endline "Now, let's open the restaurant! \n";
+  Lwt.return ()
