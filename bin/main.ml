@@ -5,15 +5,19 @@ open Table
 (* let restaurant_data = (int * Table.t * TableQueue.t) list *)
 let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))
 let table_list = ref []
+let set_coord_symbol row col sym = row.(col) <- ref sym
 let add_table_list id table = table_list := (id, table) :: !table_list
 let get_table id = List.assoc id !table_list
+
+(* changes the first nth seats of table id to sym *)
+let change_seats_sym id n sym =
+  for i = 0 to n - 1 do
+    let x, y = List.nth (Table.coord_list (get_table id)) i in
+    set_coord_symbol !restaurant_layout.(x) y sym
+  done
+
 let width = ref 0
 let height = ref 0
-
-(* let seat_party table_id = let old_table = get_table table_id in let new_table
-   = OccupiedTable.make_with_coord old_table.state old_table.capacity
-   old_table.coord_list in table_list := List.remove_assoc table_id !table_list;
-   add_table_list table_id new_table *)
 
 (* prints out the table list such that "table #'s coordinates are (#,
    #)(#,#)..." *)
@@ -25,7 +29,7 @@ let print_list () =
   let print_entry (id, table) =
     print_string
       ("table " ^ string_of_int id ^ "'s coordinates are "
-      ^ print_coord_list (ReadyTable.coord_list table)
+      ^ print_coord_list (Table.coord_list table)
       ^ "\n")
   in
   List.iter print_entry !table_list
@@ -76,7 +80,7 @@ let make_restaurant num_tables =
 
   (* creates the tables *)
   for n = 1 to num_tables * num_tables do
-    add_table_list n (ReadyTable.make 4 4)
+    add_table_list n (Table.make 4 4)
   done;
 
   let current_table = ref 1 in
@@ -103,7 +107,7 @@ let make_restaurant num_tables =
        row.(!i) <- ref " ";
        row.(!i + 1) <- ref "-";
        row.(!i + 2) <- ref "-";
-       ReadyTable.add_list (get_table !current_table) h (!i + 2);
+       Table.add_list (get_table !current_table) h (!i + 2);
        row.(!i + 3) <- ref "-";
        row.(!i + 4) <- ref " ";
        row.(!i + 5) <- ref " ";
@@ -127,12 +131,12 @@ let make_restaurant num_tables =
        row.(!i) <- ref " ";
        row.(!i + 1) <- ref " ";
        row.(!i + 2) <- ref "|";
-       ReadyTable.add_list (get_table !current_table) h (!i + 2);
+       Table.add_list (get_table !current_table) h (!i + 2);
        row.(!i + 3) <- ref " ";
        row.(!i + 4) <- ref " ";
        row.(!i + 5) <- ref " ";
        row.(!i + 6) <- ref "|";
-       ReadyTable.add_list (get_table !current_table) h (!i + 6);
+       Table.add_list (get_table !current_table) h (!i + 6);
 
        row.(!i + 7) <- ref " ";
        i := !i + 8;
@@ -174,8 +178,12 @@ let make_restaurant num_tables =
    around that table to represent the people in the party. [num_people] = the
    number of x's to place around the table [table_id] = the table to place the
    people at *)
-(* let fill_restaurant num_people table_id = if num_people > ReadyTable.capacity
-   (get_table table_id) then failwith "too much people" else () *)
+let fill_restaurant num_people table_id =
+  if num_people > Table.capacity (get_table table_id) then
+    failwith "too much people"
+  else (
+    Table.seat (get_table table_id) num_people;
+    change_seats_sym table_id num_people "*")
 
 let display_filled_restaurant () =
   (* prints everything out *)
@@ -209,7 +217,15 @@ let setup_num_tables () =
      restaurant: ";
   make_restaurant (read_int ());
   display_filled_restaurant ();
-  print_list ();
+
+  (* just for testing purposes *)
+    (* fill_restaurant 4 1;
+    display_filled_restaurant ();
+    fill_restaurant 3 5;
+    display_filled_restaurant (); *)
+
+  (* just for testing purposes *)
+    (* print_list (); *)
   Lwt.return ()
 
 (* running the game *)
