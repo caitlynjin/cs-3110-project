@@ -93,6 +93,14 @@ let create_filled_restaurant2 num_tables =
   print_string "\n \n";
   ()
 
+let setup_num_tables () =
+  print_endline
+    "First, enter the number of tables for the width and the height of the \
+     restaurant: ";
+  let n = read_int () in
+  create_filled_restaurant2 n;
+  Lwt.return ()
+
 (* running the game *)
 let () =
   Lwt_main.run
@@ -111,13 +119,8 @@ let () =
       >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () ->
       read_enter () >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () -> Menus.set_up_restaurant () );
-  print_endline
-    "First, enter the number of tables for the width and the height of the \
-     restaurant: ";
-  let n = read_int () in
-  (* create_filled_restaurant1 n; *)
-  create_filled_restaurant2 n;
+      Lwt_unix.sleep 2. >>= fun () ->
+      Menus.set_up_restaurant () >>= fun () -> setup_num_tables () );
   read_key ()
 
 (* print_endline "Thank you for playing Dish Dash Dilemma!";; *)
