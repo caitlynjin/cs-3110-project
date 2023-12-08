@@ -21,6 +21,18 @@ let height = ref 0
 
 (* prints out the table list such that "table #'s coordinates are (#,
    #)(#,#)..." *)
+let _print_list () =
+  let print_coord acc (h, w) =
+    acc ^ "(" ^ string_of_int h ^ ", " ^ string_of_int w ^ ")"
+  in
+  let print_coord_list lst = List.fold_left print_coord "" lst in
+  let print_entry (id, table) =
+    print_string
+      ("table " ^ string_of_int id ^ "'s coordinates are "
+      ^ print_coord_list (Table.coord_list table)
+      ^ "\n")
+  in
+  List.iter print_entry !table_list
 
 let keys : string =
   "\n\
@@ -206,6 +218,13 @@ let setup_num_tables () =
      restaurant: ";
   make_restaurant (read_int ());
   display_filled_restaurant ();
+
+  (* just for testing purposes *)
+  (* fill_restaurant 4 1; display_filled_restaurant (); fill_restaurant 3 5;
+     display_filled_restaurant (); *)
+
+  (* just for testing purposes *)
+  (* print_list (); *)
   Lwt.return ()
 
 (* running the game *)
@@ -254,6 +273,13 @@ let () =
       >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () -> setup_num_tables () );
   print_endline keys;
-  read_key ();
+  read_key (); 
 
-  print_endline "Thank you for playing Dish Dash Dilemma!"
+  (* TODO: uncomment this for end of game *)
+  (* >>= fun () ->
+  Lwt_unix.sleep 1. >>= fun () ->
+  Lwt_io.printl "Thank you for playing Dish Dash Dilemma!" >>= fun () ->
+  Lwt_unix.sleep 1. >>= fun () ->
+  Lwt_io.printl
+    "Goodbye! (3110 Final Project FA2023: \n\
+    \   by: C. Jin, S. Pan, K. Sabile, S. Wang)" *)

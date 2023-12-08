@@ -3,6 +3,9 @@ open Restaurant
 open Queue
 open Table
 
+(* open Menus *)
+open Points
+
 let queue_tests =
   [
     ( "empty queue" >:: fun _ ->
@@ -62,7 +65,62 @@ let table_tests =
     ("dirty table is ready" >:: fun _ -> assert_equal true DirtyTable.isReady);
   ]
 
+(* let menu_test = [ ("menu test" >:: fun _ -> assert_equal "" !Menus.cuisine)
+   ] *)
+let gamepts = Points.game_pts
+
+(* let pp_string s = "\"" ^ s ^ "\"" *)
+let pp_int i = "\"" ^ string_of_int i ^ "\""
+
+let points_test =
+  [
+    (* points for queue management: parties_points *)
+    ( "short wait time" >:: fun _ ->
+      let _ = gamepts.queue_performance <- 0 in
+      let _ = Points.parties_points 5 3 in
+      assert_equal ~printer:pp_int 75 gamepts.queue_performance );
+    (* values accumulate?.. so set back to 0 *)
+    ( "medium wait time" >:: fun _ ->
+      let _ = gamepts.queue_performance <- 0 in
+      let _ = Points.parties_points 2 11 in
+      assert_equal ~printer:pp_int 20 gamepts.queue_performance );
+    ( "long wait time" >:: fun _ ->
+      let _ = gamepts.queue_performance <- 0 in
+      let _ = Points.parties_points 5 35 in
+      assert_equal ~printer:pp_int 25 gamepts.queue_performance );
+    (* points for treating parties at tables: meals_points *)
+    ( "short food time" >:: fun _ ->
+      let _ = gamepts.meals <- 0 in
+      let _ = Points.meals_points 1 1 1 1 in
+      assert_equal ~printer:pp_int 25 gamepts.meals );
+    ( "long food time" >:: fun _ ->
+      let _ = gamepts.meals <- 0 in
+      let _ = Points.meals_points 1 30 2 1 in
+      assert_equal ~printer:pp_int 15 gamepts.meals );
+    ( "long duration at table" >:: fun _ ->
+      let _ = gamepts.meals <- 0 in
+      let _ = Points.meals_points 5 1 1 40 in
+      assert_equal ~printer:pp_int 95 gamepts.meals );
+    ( "short duration at table" >:: fun _ ->
+      let _ = gamepts.meals <- 0 in
+      let _ = Points.meals_points 5 2 1 1 in
+      assert_equal ~printer:pp_int 45 gamepts.meals );
+    ( "medium food time" >:: fun _ ->
+      let _ = gamepts.meals <- 0 in
+      let _ = Points.meals_points 1 12 1 12 in
+      assert_equal ~printer:pp_int 17 gamepts.meals );
+    ( "medium duration" >:: fun _ ->
+      let _ = gamepts.meals <- 0 in
+      let _ = Points.meals_points 1 3 1 25 in
+      assert_equal ~printer:pp_int 30 gamepts.meals );
+    (* points from money generated: profits_points *)
+    ( "test profits" >:: fun _ ->
+      let _ = Points.profits_points 25. in
+      assert_equal ~printer:pp_int 625 gamepts.profits );
+  ]
+
 let suite =
-  "test suite for project" >::: List.flatten [ queue_tests; table_tests ]
+  "test suite for project"
+  >::: List.flatten [ queue_tests; table_tests; points_test ]
 
 let () = run_test_tt_main suite
