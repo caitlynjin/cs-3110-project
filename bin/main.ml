@@ -8,7 +8,6 @@ open Points
 
 let keys : string =
   "These are the valid commands for the game: \n\
-  \ - enter bar to get the size of the next party on queue \n\
   \ - \"next\" to seat the next party in queue \n\
   \ - \"help\" to see the valid key commands \n\
   \ - \"exit\" to quit the game \n"
@@ -40,12 +39,6 @@ let rec read_key () =
     print_endline
       "Which table number do you want to seat the party at? (starts from 1 and \
        increases across the row first, then goes down columns) ";
-    (* let rec seat n = let c = (Rest.get_table (n)).capacity in if c <
-       party_size then print_endline "Uh oh! That table is too small for this
-       group. Try again~"; seat (read_int ()) else if c > (party_size + 2) then
-       print_endline "That table has too many seats for this group! Try again~";
-       seat (read_int ()) else print_endline "Great job! The customers are happy
-       with their placement."; *)
     let rec seat n =
       try Rest.seat_party party_size n with
       | Rest.SizeError ->
@@ -150,10 +143,12 @@ let () =
       setup_num_tables () >>= fun () ->
       Lwt_unix.sleep 1. >>= fun () ->
       Lwt_io.printl keys >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () -> Lwt.return (read_key ()) )
-
-(* TODO: uncomment this for end of game *)
-(* >>= fun () -> Lwt_unix.sleep 1. >>= fun () -> Lwt_io.printl "Thank you for
-   playing Dish Dash Dilemma!" >>= fun () -> Lwt_unix.sleep 1. >>= fun () ->
-   Lwt_io.printl "Goodbye! (3110 Final Project FA2023: \n\ \ by: C. Jin, S. Pan,
-   K. Sabile, S. Wang)" *)
+      Lwt_unix.sleep 2. >>= fun () ->
+      Lwt.return (read_key ()) >>= fun () ->
+      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_io.printl "Thank you for\n   playing Dish Dash Dilemma!" >>= fun () ->
+      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_io.printl
+        "Goodbye! (3110 Final Project FA2023: \n\
+        \  by: C. Jin, S. Pan,\n\
+        \   K. Sabile, S. Wang)" )
