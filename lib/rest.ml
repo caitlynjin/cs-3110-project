@@ -225,6 +225,12 @@ module Rest = struct
         reset_table table_id
     | None -> failwith "Impossible"
 
+  (** Modifies the corresponding table [id] to Ready *)
+  let clean_table id = Table.clean (get_table id)
+
+  (** returns the table list *)
   let get_table_list = !table_list
+
+  (** returns the symbol at coordinate [x] [y] *)
   let get_coord_value x y = !(!restaurant_layout.(x).(y))
 end
