@@ -1,10 +1,7 @@
 open Lwt.Infix
+open Yojson.Basic.Util
 
-(** A model that sets up the restaurant, prompting the player for the name of
-    the restaurant, cuisine, and menu. *)
 module Menus = struct
-  (* TODO: CALL THESE BEFORE ASKING PLAYER FOR TABLE SIZE *)
-
   (** The default name of the restaurant in case the player doesn't input one. *)
   let restaurant_name = ref "Default Restaurant Name"
 
@@ -14,6 +11,9 @@ module Menus = struct
     ingredients : string list;
     make_time : int;
   }
+
+  type menu = (string * dish list) list
+
   (** Type representing a dish, which includes a name, price, ingredients, and
       the time it takes to make the dish. *)
 
@@ -483,7 +483,7 @@ module Menus = struct
       print_endline (cuisine_announcement ^ !cuisine ^ ".");
       Lwt_unix.sleep 2.
     end
-    else begin 
+    else begin
       print_endline
         "\nPlease enter a valid cuisine style, or type \"exit\" to quit. ";
       read_key ()
@@ -549,9 +549,11 @@ module Menus = struct
   let rec make_menu () =
     let input = read_line () in
     if input = "standard" then begin
-      restaurant_menu := set_menu !cuisine
-      (* print_endline ("The menu for your " ^ !cuisine ^ " restaurant is: \n" ^
-         string_of_list (List.map (fun x -> x.name) !restaurant_menu) ^ ".") *);
+      restaurant_menu := set_menu !cuisine;
+      print_endline
+        ("The menu for your " ^ !cuisine ^ " restaurant is: \n"
+        ^ string_of_list (List.map (fun x -> x.name) !restaurant_menu)
+        ^ ".");
       Lwt.return ()
     end
     else if input = "suggest" then begin
@@ -600,9 +602,58 @@ module Menus = struct
       in
       set_dishes
 
+  let json_to_menu json =
+    match json with
+    | `List dishes ->
+        List.map
+          (fun attrs ->
+            let name = member "name" attrs |> to_string in
+            let price = member "price" attrs |> to_float in
+            let ingredients =
+              member "ingredients" attrs |> to_list |> filter_string
+            in
+            let make_time = member "make_time" attrs |> to_int in
+            { name; price; ingredients; make_time })
+          dishes
+    | `Assoc [ (_, `List dishes) ] ->
+        List.map
+          (fun attrs ->
+            let name = member "name" attrs |> to_string in
+            let price = member "price" attrs |> to_float in
+            let ingredients =
+              member "ingredients" attrs |> to_list |> filter_string
+            in
+            let make_time = member "make_time" attrs |> to_int in
+            { name; price; ingredients; make_time })
+          dishes
+    | _ -> failwith "Invalid JSON format"
+
+  (* let filter_string = function | `String s -> s | _ -> failwith "Unexpected
+     JSON type" *)
+
+  (* let _json_to_menu json = let rec extract_dish dish = match dish with |
+     `Assoc attrs -> let name = List.assoc "name" attrs |> float_of_string |>
+     filter_string in let price = List.assoc "price" attrs in let ingredients =
+     List.assoc "ingredients" attrs |> filter_string in let make_time =
+     List.assoc "make_time" attrs |> to_int in { name; price; ingredients;
+     make_time } | _ -> failwith "Invalid JSON format for dish" in
+
+     match json with | `Assoc menu -> List.map (fun (menu_type, dishes) -> let
+     dishes_list = match dishes with | `List dish_list -> List.map extract_dish
+     dish_list | _ -> failwith "Invalid JSON format for dishes" in (menu_type,
+     dishes_list)) menu | _ -> failwith "Invalid JSON format for menu" *)
+
   (** A sequence of prompts for the user to set up the restaurant, including the
       restaurant name, type, and menu. *)
   let set_up_restaurant () =
+    (* let current_directory = Sys.getcwd () in print_endline ("Current Working
+       Directory: " ^ current_directory); let json_string =
+       Yojson.Basic.from_file "lib/menus.json" in print_endline
+       (Yojson.Basic.pretty_to_string json_string); let menu = json_to_menu
+       json_string in (* Print the menu *) List.iter (fun dish -> print_endline
+       ("Name: " ^ dish.name ^ "Price: " ^ string_of_float dish.price ^
+       "\nIngredients: " ^ String.concat ", " dish.ingredients ^ "\nMake Time: "
+       ^ string_of_int dish.make_time ^ "\n\n")) menu; *)
     Lwt_io.printl "Let's set up our restaurant!" >>= fun () ->
     Lwt_unix.sleep 2. >>= fun () ->
     name_res () >>= fun () ->
