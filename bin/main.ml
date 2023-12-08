@@ -67,14 +67,15 @@ let table_middle_row row width =
 
 let display_filled_restaurant num_tables =
   let width = (5 * num_tables) + (3 * (num_tables - 1)) + 8 in
-  let height = num_tables * 5 in
-  for n = 0 to height + 2 do
+  let height = (num_tables * 5) + 2 in
+  restaurant_layout := Array.make height (Array.make 0 (ref ""));
+  for n = 1 to height - 1 do
     !restaurant_layout.(n) <- Array.make width (ref "")
   done;
   (* restaurant_layout.(0) <- ref "\n ~Dish Dash Dilemma!"; *)
-  generate_row !restaurant_layout.(0) 0 (width - 1) (ref "-");
+  generate_row !restaurant_layout.(0) 0 width (ref "-");
   let i = ref 1 in
-  while !i < height do
+  while !i < height - 2 do
     generate_row !restaurant_layout.(!i) 1 (width - 1) (ref " ");
     create_table_end !restaurant_layout.(!i + 1) width;
     table_middle_row !restaurant_layout.(!i + 2) width;
