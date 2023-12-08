@@ -1,4 +1,4 @@
 (library
  (name restaurant)
  (public_name Restaurant)
- (libraries lwt lwt.unix))
+ (libraries lwt lwt.unix yojson))
