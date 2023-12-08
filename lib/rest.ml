@@ -1,25 +1,40 @@
 open Table
 
+(** A model that lays out the restaurant user interface. *)
 module Rest = struct
   type t = string ref array array ref
 
+  (** The restaurant's layout, which is represented by a 2D array. *)
   let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))
+
+  (** The list of tables represented by a 2D array of table id's the table
+      itself. *)
   let table_list = ref []
+
+  (** Sets the symbol [sym] to the coordinate at row [row] and column [col]. *)
   let set_coord_symbol row col sym = row.(col) <- ref sym
+
+  (** Adds the table with the [id] to the list of tables [table_list]. *)
   let add_table_list id table = table_list := (id, table) :: !table_list
+
+  (** Gets the table with the corresponding [id]. *)
   let get_table id = List.assoc id !table_list
 
-  (* changes the first nth seats of table id to sym *)
+  (* Changes the first [n]th seats of the table [id] to the following symbol
+     [sym]. *)
   let change_seats_sym id n sym =
     for i = 0 to n - 1 do
       let x, y = List.nth (Table.coord_list (get_table id)) i in
       set_coord_symbol !restaurant_layout.(x) y sym
     done
 
+  (** The width of the restaurant. *)
   let width = ref 0
+
+  (** The height of the restaurant. *)
   let height = ref 0
 
-  (* creates a restaurant based on the number of tables *)
+  (** Creates a restaurant based on the set number of tables [num_tables]. *)
   let make_restaurant num_tables =
     (* sets width and height *)
     width := (5 * num_tables) + (3 * (num_tables - 1)) + 8;
@@ -122,6 +137,8 @@ module Rest = struct
     generate_row !restaurant_layout.(!height - 2) 1 (!width - 1) (ref " ");
     generate_row !restaurant_layout.(!height - 1) 0 !width (ref "-")
 
+  (** Prints the restaurant including the people that may or may not be seated
+      in the restaurant. *)
   let display_filled_restaurant () =
     (* prints everything out *)
     for i = 0 to !height - 1 do
@@ -136,8 +153,8 @@ module Rest = struct
     done;
     print_endline "\n"
 
-  (* prints out the table list such that "table #'s coordinates are (#,
-     #)(#,#)..." *)
+  (** Prints out the table list such that "table #'s coordinates are (#,
+      #)(#,#)..." *)
   let print_list () =
     let print_coord acc (h, w) =
       acc ^ "(" ^ string_of_int h ^ ", " ^ string_of_int w ^ ")"
@@ -151,10 +168,10 @@ module Rest = struct
     in
     List.iter print_entry !table_list
 
-  (* seat_party will modify the corresponding rows of table_id and place 'x's
-     around that table to represent the people in the party. [num_people] = the
-     number of x's to place around the table [table_id] = the table to place the
-     people at *)
+  (** Modifies the corresponding rows of table_id and place 'x's around that
+      table to represent the people in the party. [num_people] = the number of
+      x's to place around the table [table_id] = the table to place the people
+      at. *)
   let seat_party num_people table_id =
     if Table.isReady (get_table table_id) then
       if num_people > Table.capacity (get_table table_id) then
