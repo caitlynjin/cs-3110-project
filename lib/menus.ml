@@ -14,10 +14,8 @@ module Menus = struct
     ingredients : string list;
     make_time : int;
   }
-  (** The type for a dish, which contains a name, price, ingredients, and the
-      time it takes to make the dish. *)
-
-  (* type menu = dish list *)
+  (** Type representing a dish, which includes a name, price, ingredients, and
+      the time it takes to make the dish. *)
 
   (** The cuisine type for the restaurant, which is a string. *)
   let cuisine = ref ""

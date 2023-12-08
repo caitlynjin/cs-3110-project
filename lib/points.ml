@@ -7,13 +7,13 @@ module Points = struct
   (** The name of the restaurant. *)
   let name = "placeholder"
 
-  (* A type for the point system to determine the performance of the user during
-     the game. *)
   type points = {
     mutable queue_performance : int;
     mutable meals : int;
     mutable profits : int;
   }
+  (** Type for the point system to determine the performance of the user during
+      the game. *)
 
   (** A record containing the points in the game in the categories for queue
       performance, meals, and profits. *)
