@@ -2,13 +2,14 @@ open Lwt.Infix
 open Restaurant
 open Menus
 open Rest
+open Points
 
-(** A string containing all the valid commands for the game. *)
+(* let restaurant_data = (int * Table.t * TableQueue.t) list *)
+
 let keys : string =
-  "\n\
-  \ Here are valid commands for the game: \n\
+  "These are the valid commands for the game: \n\
   \ - enter bar to get the size of the next party on queue \n\
-  \ - \"a\" to seat the next party in queue \n\
+  \ - \"next\" to seat the next party in queue \n\
   \ - \"help\" to see the valid key commands \n\
   \ - \"exit\" to quit the game \n"
 
@@ -26,29 +27,55 @@ let rec read_int () =
     queue party. *)
 let rec read_key () =
   (* TODO: edit these instructions *)
-  print_string "Insert a command here: ";
+  print_string "Enter a command here: ";
   (* TODO: implement "a" to seat ppl *)
   let input = read_line () in
-  if input = "" then (
+  if input = "next" then (
     (* TODO: call actual next queue party here *)
-    let party_size = 1 + Random.int 10 in
+    Random.self_init ();
+    let party_size = 1 + Random.int 3 in
+    let start_time = Unix.gettimeofday () in
     print_endline
       ("Next in line is a party of " ^ string_of_int party_size ^ ".");
-    Lwt_unix.sleep 1. >>= fun () ->
-    Lwt_io.printl keys >>= fun () -> read_key ())
-  else if input = "a" then (
     print_endline
-      "Which table number do you want to seat the party at? (increases across \
-       the row first, then goes down columns) ";
-    let table_num = read_int () in
-    Rest.seat_party 3 table_num;
+      "Which table number do you want to seat the party at? (starts from 1 and \
+       increases across the row first, then goes down columns) ";
+    (* let rec seat n = let c = (Rest.get_table (n)).capacity in if c <
+       party_size then print_endline "Uh oh! That table is too small for this
+       group. Try again~"; seat (read_int ()) else if c > (party_size + 2) then
+       print_endline "That table has too many seats for this group! Try again~";
+       seat (read_int ()) else print_endline "Great job! The customers are happy
+       with their placement."; *)
+    let rec seat n =
+      try Rest.seat_party party_size n with
+      | Rest.SizeError ->
+          print_endline
+            "Uh oh! Looks like that table is occupied. Try choosing another \
+             one:";
+          seat (read_int ())
+      | Rest.TableOccupied ->
+          print_endline
+            "Oops, looks like that table hasn't been cleaned yet - try again:";
+          seat (read_int ())
+      | Rest.TableNotFound ->
+          print_endline "That table doesn't exist! Try again:";
+          seat (read_int ())
+    in
+    seat (read_int ());
+    print_endline "Great job! Your restaurant now looks like this: ";
+    Rest.display_filled_restaurant ();
+    Points.parties_points
+      (int_of_float (Unix.gettimeofday () -. start_time))
+      party_size;
+    Points.show_points ();
     read_key ())
   else if input = "help" then
     let _ = print_endline keys in
     read_key ()
   else if input = "exit" then exit 0
   else (
-    print_endline "Please press enter or type \"exit\" to quit. ";
+    print_endline
+      "Invalid command. Type \"help\" to see the list of valid commands. ";
     read_key ())
 
 (** Reads the user input and checks for the enter key. If not, then exits. *)
@@ -56,7 +83,6 @@ let read_enter () =
   Lwt_io.read_line_opt Lwt_io.stdin >>= function
   | Some input -> if input = "" then Lwt.return () else exit 0
   | None -> exit 0
-
 
 (* let empty_restaurant size = Array.make size (ref "") *)
 
@@ -101,16 +127,16 @@ let () =
       Lwt_unix.sleep 2. >>= fun () ->
       Lwt_io.printl
         "\n\
-         You will be given a queue of parties waiting to be seated. \n\
-        \  You must seat them in the restaurant."
+         You will be given a queue of parties waiting to be seated.\n\
+        \ You must seat them in the restaurant at appropriate tables."
       >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () ->
       Lwt_io.printl
         "\n\
-         If you seat them at a table that is too small, they will leave. \n\
-        \  If you seat them at a table that is too big, they will leave. \n\
-        \  If you seat them at a table that is not ready, they will leave. \n\
-        \  If you seat them at a table that is just right, they will stay!"
+        \  - If you seat them at a table that is too small, they will leave. \n\
+        \  - If you seat them at a table that is too big, they will leave. \n\
+        \  - If you seat them at a table that is not ready, they will leave. \n\
+        \  - If you seat them at a table that is just right, they will stay!"
       >>= fun () ->
       Lwt_unix.sleep 3. >>= fun () ->
       Lwt_io.printl
@@ -124,7 +150,7 @@ let () =
       setup_num_tables () >>= fun () ->
       Lwt_unix.sleep 1. >>= fun () ->
       Lwt_io.printl keys >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () -> read_key () )
+      Lwt_unix.sleep 2. >>= fun () -> Lwt.return (read_key ()) )
 
 (* TODO: uncomment this for end of game *)
 (* >>= fun () -> Lwt_unix.sleep 1. >>= fun () -> Lwt_io.printl "Thank you for

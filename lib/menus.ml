@@ -477,6 +477,7 @@ module Menus = struct
     end
     else if input = "random" || input = "exit" then begin
       let random_cuisine =
+        Random.self_init ();
         List.nth cuisine_list (Random.int (List.length cuisine_list))
       in
       cuisine := random_cuisine;
@@ -583,7 +584,8 @@ module Menus = struct
         let dish_price = read_float () in
         print_endline "\n What are the ingredients of this dish? ";
         let dish_ingredients = read_line () in
-        print_endline "\n How long does it take to make this dish? ";
+        print_endline
+          "\n How long, in minutes, does it take to make this dish? ";
         let dish_time : int =
           let rec set_time () : int =
             try int_of_string (read_line ())
@@ -659,7 +661,9 @@ module Menus = struct
     name_res () >>= fun () ->
     read_key () >>= fun () ->
     Lwt_unix.sleep 2. >>= fun () ->
-    Lwt_io.printl "Now, let's make the menu! What dishes do you want to serve?"
+    Lwt_io.printl
+      "Now, let's make the menu! What dishes do you want to serve to your \
+       customers?"
     >>= fun () ->
     Lwt_io.printl
       "  Or, type 'suggest' to see some suggestions of dishes to add, or \
