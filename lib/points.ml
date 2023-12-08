@@ -23,10 +23,6 @@ module Points = struct
     else if wait_time > 10 then wait_points := party_size * 10
     else wait_points := party_size * 15;
 
-    (* points calculated from party size *)
-    (* let party_points = party_size * 10 in *)
-    (* print_endline ("wait points: " ^ string_of_int !wait_points);
-    print_endline ("queueperform: " ^ string_of_int game_pts.queue_performance); *)
     (* update points *)
     game_pts.queue_performance <- game_pts.queue_performance + !wait_points
 

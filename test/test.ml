@@ -74,6 +74,7 @@ let pp_int i = "\"" ^ string_of_int i ^ "\""
 
 let points_test =
   [
+    (* points for queue management: parties_points *)
     ( "short wait time" >:: fun _ ->
       let _ = gamepts.queue_performance <- 0 in
       let _ = Points.parties_points 5 3 in
@@ -87,6 +88,7 @@ let points_test =
       let _ = gamepts.queue_performance <- 0 in
       let _ = Points.parties_points 5 35 in
       assert_equal ~printer:pp_int 25 gamepts.queue_performance );
+    (* points for treating parties at tables: meals_points *)
     ( "short food time" >:: fun _ ->
       let _ = gamepts.meals <- 0 in
       let _ = Points.meals_points 1 1 1 1 in
@@ -95,10 +97,10 @@ let points_test =
       let _ = gamepts.meals <- 0 in
       let _ = Points.meals_points 1 30 2 1 in
       assert_equal ~printer:pp_int 15 gamepts.meals );
-    ( "long duration at time" >:: fun _ ->
+    ( "long duration at table" >:: fun _ ->
       let _ = gamepts.meals <- 0 in
       let _ = Points.meals_points 5 1 1 40 in
-      assert_equal ~printer:pp_int 80 gamepts.meals );
+      assert_equal ~printer:pp_int 95 gamepts.meals );
     ( "short duration at table" >:: fun _ ->
       let _ = gamepts.meals <- 0 in
       let _ = Points.meals_points 5 2 1 1 in
@@ -106,12 +108,17 @@ let points_test =
     ( "medium food time" >:: fun _ ->
       let _ = gamepts.meals <- 0 in
       let _ = Points.meals_points 1 12 1 12 in
-      assert_equal ~printer:pp_int 72 gamepts.meals );
+      assert_equal ~printer:pp_int 17 gamepts.meals );
     ( "medium duration" >:: fun _ ->
       let _ = gamepts.meals <- 0 in
       let _ = Points.meals_points 1 3 1 25 in
-      assert_equal ~printer:pp_int 45 gamepts.meals );
+      assert_equal ~printer:pp_int 30 gamepts.meals );
+    (* points from money generated: profits_points *)
+    ( "test profits" >:: fun _ ->
+      let _ = Points.profits_points 25. in
+      assert_equal ~printer:pp_int 625 gamepts.profits );
   ]
+
 let suite =
   "test suite for project"
   >::: List.flatten [ queue_tests; table_tests; points_test ]
