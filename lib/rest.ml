@@ -29,6 +29,19 @@ module Rest = struct
       set_coord_symbol !restaurant_layout.(x) y sym
     done
 
+  (** Resets the table [id] to its default state such that . This only changes
+      the appearance of the coordinates of the table, does not modify any other
+      aspects of the table *)
+  let reset_table id =
+    let b1, b2 = List.nth (Table.coord_list (get_table id)) 0 in
+    let t1, t2 = List.nth (Table.coord_list (get_table id)) 3 in
+    let l1, l2 = List.nth (Table.coord_list (get_table id)) 2 in
+    let r1, r2 = List.nth (Table.coord_list (get_table id)) 1 in
+    set_coord_symbol !restaurant_layout.(b1) b2 "-";
+    set_coord_symbol !restaurant_layout.(t1) t2 "-";
+    set_coord_symbol !restaurant_layout.(r1) r2 "|";
+    set_coord_symbol !restaurant_layout.(l1) l2 "|"
+
   (** The width of the restaurant. *)
   let width = ref 0
 
@@ -181,4 +194,15 @@ module Rest = struct
         Table.seat (get_table table_id) num_people;
         change_seats_sym table_id num_people "*")
     else failwith "Table is not ready"
+
+  (** Modifies the corresponding rows of table_id and place '-'s or '|'s
+      correspondinly around that table where people ('*') once were to represent
+      the people in the party leaving and the table being cleared. [table_id] =
+      the table to clear the people from *)
+  let finish_eating table_id =
+    Table.finish (get_table table_id);
+    reset_table table_id
+
+  let get_table_list = !table_list
+  let get_coord_value x y = !(!restaurant_layout.(x).(y))
 end
