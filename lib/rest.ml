@@ -18,8 +18,11 @@ module Rest = struct
   (** Adds the table with the [id] to the list of tables [table_list]. *)
   let add_table_list id table = table_list := (id, table) :: !table_list
 
-  (** Gets the table with the corresponding [id]. *)
+  (** Gets the table with the corresponding [id] as [option]. *)
   let get_table id = List.assoc_opt id !table_list
+
+  (** Gets the table with the corresponding [id]. *)
+  let get_act_table id = List.assoc id !table_list
 
   exception SizeError
   exception TableOccupied
@@ -30,10 +33,14 @@ module Rest = struct
   let change_seats_sym id n sym =
     match get_table id with
     | Some table ->
-        for i = 0 to n - 1 do
-          let x, y = List.nth (Table.coord_list table) i in
-          set_coord_symbol !restaurant_layout.(x) y sym
-        done
+        if n > 4 then failwith ("Error" ^ string_of_int n)
+        else if List.length (Table.coord_list table) = 0 then
+          failwith "Error list is 0 "
+        else
+          for i = 0 to n - 1 do
+            let x, y = List.nth (Table.coord_list table) i in
+            set_coord_symbol !restaurant_layout.(x) y sym
+          done
     | None -> raise TableNotFound
 
   (** Resets the table [id] to its default state such that . This only changes
@@ -84,62 +91,57 @@ module Rest = struct
     (* creates the end of tables and adds coordiantes to each table in the
        list *)
     let create_table_end row width h =
-      row.(0) <- ref "|";
-      row.(1) <- ref " ";
-      row.(2) <- ref " ";
-      row.(3) <- ref " ";
+      (row.(0) <- ref "|";
+       row.(1) <- ref " ";
+       row.(2) <- ref " ";
+       row.(3) <- ref " ";
 
-      match get_table !current_table with
-      | Some table ->
-          let i = ref 4 in
-          while !i < width - 8 do
-            row.(!i) <- ref " ";
-            row.(!i + 1) <- ref "-";
-            row.(!i + 2) <- ref "-";
-            Table.add_list table h (!i + 2);
-            row.(!i + 3) <- ref "-";
-            row.(!i + 4) <- ref " ";
-            row.(!i + 5) <- ref " ";
-            row.(!i + 6) <- ref " ";
-            row.(!i + 7) <- ref " ";
-            i := !i + 8;
-            current_table := !current_table + 1
-          done;
-          row.(width - 1) <- ref "|";
-          current_table := !current_table - num_tables
-      | None -> failwith "Impossible"
+       let i = ref 4 in
+       while !i < width - 8 do
+         row.(!i) <- ref " ";
+         row.(!i + 1) <- ref "-";
+         row.(!i + 2) <- ref "-";
+         Table.add_list (get_act_table !current_table) h (!i + 2);
+         row.(!i + 3) <- ref "-";
+         row.(!i + 4) <- ref " ";
+         row.(!i + 5) <- ref " ";
+         row.(!i + 6) <- ref " ";
+         row.(!i + 7) <- ref " ";
+         i := !i + 8;
+         current_table := !current_table + 1
+       done;
+       row.(width - 1) <- ref "|");
+      current_table := !current_table - num_tables
     in
 
     (* creates the middle row of the table (the | | of each table) *)
     let table_middle_row row width h =
-      (* sets the left border of the row *)
-      row.(0) <- ref "|";
-      row.(1) <- ref " ";
-      (* manually does the | | thing *)
-      match get_table !current_table with
-      | Some table ->
-          let i = ref 2 in
-          while !i < width - 8 do
-            row.(!i) <- ref " ";
-            row.(!i + 1) <- ref " ";
-            row.(!i + 2) <- ref "|";
-            Table.add_list table h (!i + 2);
-            row.(!i + 3) <- ref " ";
-            row.(!i + 4) <- ref " ";
-            row.(!i + 5) <- ref " ";
-            row.(!i + 6) <- ref "|";
-            Table.add_list table h (!i + 6);
+      ((* sets the left border of the row *)
+       row.(0) <- ref "|";
+       row.(1) <- ref " ";
 
-            row.(!i + 7) <- ref " ";
-            i := !i + 8;
-            current_table := !current_table + 1
-          done;
-          (* sets the right border of the row *)
-          row.(width - 3) <- ref " ";
-          row.(width - 2) <- ref " ";
-          row.(width - 1) <- ref "|";
-          current_table := !current_table - num_tables
-      | None -> failwith "Impossible"
+       (* manually does the | | thing *)
+       let i = ref 2 in
+       while !i < width - 8 do
+         row.(!i) <- ref " ";
+         row.(!i + 1) <- ref " ";
+         row.(!i + 2) <- ref "|";
+         Table.add_list (get_act_table !current_table) h (!i + 2);
+         row.(!i + 3) <- ref " ";
+         row.(!i + 4) <- ref " ";
+         row.(!i + 5) <- ref " ";
+         row.(!i + 6) <- ref "|";
+         Table.add_list (get_act_table !current_table) h (!i + 6);
+
+         row.(!i + 7) <- ref " ";
+         i := !i + 8;
+         current_table := !current_table + 1
+       done;
+       (* sets the right border of the row *)
+       row.(width - 3) <- ref " ";
+       row.(width - 2) <- ref " ";
+       row.(width - 1) <- ref "|");
+      current_table := !current_table - num_tables
     in
 
     restaurant_layout := Array.make !height (Array.make !width (ref ""));
@@ -226,7 +228,10 @@ module Rest = struct
     | None -> failwith "Impossible"
 
   (** Modifies the corresponding table [id] to Ready *)
-  let clean_table id = Table.clean (get_table id)
+  let clean_table id =
+    match get_table id with
+    | None -> ()
+    | Some x -> Table.clean x
 
   (** returns the table list *)
   let get_table_list = !table_list
