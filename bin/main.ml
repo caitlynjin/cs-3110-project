@@ -1,5 +1,6 @@
 open Lwt.Infix
 open Restaurant
+open Table
 open Menus
 open Rest
 
