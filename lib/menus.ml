@@ -483,7 +483,7 @@ module Menus = struct
       print_endline (cuisine_announcement ^ !cuisine ^ ".");
       Lwt_unix.sleep 2.
     end
-    else begin
+    else begin 
       print_endline
         "\nPlease enter a valid cuisine style, or type \"exit\" to quit. ";
       read_key ()

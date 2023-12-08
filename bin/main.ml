@@ -57,6 +57,7 @@ let read_enter () =
   | Some input -> if input = "" then Lwt.return () else exit 0
   | None -> exit 0
 
+
 (* let empty_restaurant size = Array.make size (ref "") *)
 
 (** Creates and displays a restaurant with the user-specified number of tables. *)
@@ -114,8 +115,8 @@ let () =
       Lwt_unix.sleep 3. >>= fun () ->
       Lwt_io.printl
         "\n\
-         You will be given a score based on how many parties you seat. \n\
-        \  You will lose if you seat too many parties at the wrong table size. \n\
+         You will be given a score based on how many parties you seat. You \
+         will lose if you seat too many parties at the wrong table size. \n\
         \  You will win if you seat all the parties in the queue. \n\
         \ Good luck! \n"
       >>= fun () ->
