@@ -76,12 +76,20 @@ let rec read_key () =
   print_string "Insert a command here: ";
   (* TODO: implement "a" to seat ppl *)
   let input = read_line () in
-  if input = "" then
+  if input = "" then (
     (* TODO: call actual next queue party here *)
     let party_size = 1 + Random.int 10 in
     print_endline
-      ("Next in line is a party of " ^ string_of_int party_size ^ ".")
-    (* TODO: call read_key after re-printing key commands *)
+      ("Next in line is a party of " ^ string_of_int party_size ^ ".");
+    Lwt_unix.sleep 1. >>= fun () ->
+    Lwt_io.printl keys >>= fun () -> read_key ())
+  else if input = "a" then (
+    print_endline
+      "Which table number do you want to seat the party at? (increases across \
+       the row first, then goes down columns) ";
+    let table_num = read_int () in
+    Rest.seat_party 3 table_num;
+    read_key ())
   else if input = "help" then
     let _ = print_endline keys in
     read_key ()
@@ -98,7 +106,7 @@ let read_enter () =
 
 (* let empty_restaurant size = Array.make size (ref "") *)
 
-let make_restaurant num_tables =
+let _make_restaurant num_tables =
   (* sets width and height *)
   width := (5 * num_tables) + (3 * (num_tables - 1)) + 8;
   height := (num_tables * 5) + 2;
@@ -212,7 +220,7 @@ let _fill_restaurant num_people table_id =
 
 (** Prints the restaurant including the people that may or may not be seated in
     the restaurant. *)
-let display_filled_restaurant () =
+let _display_filled_restaurant () =
   (* prints everything out *)
   for i = 0 to !height - 1 do
     for j = 0 to !width - 1 do
@@ -274,15 +282,15 @@ let () =
       read_enter () >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () ->
       Menus.set_up_restaurant () >>= fun () ->
-      Lwt_io.printl "\n  The objective of the game is to manage the restaurant."
+      Lwt_io.printl "The objective of the game is to manage the restaurant."
       >>= fun () ->
-      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () ->
       Lwt_io.printl
         "\n\
          You will be given a queue of parties waiting to be seated. \n\
         \  You must seat them in the restaurant."
       >>= fun () ->
-      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () ->
       Lwt_io.printl
         "\n\
          If you seat them at a table that is too small, they will leave. \n\
@@ -290,7 +298,7 @@ let () =
         \  If you seat them at a table that is not ready, they will leave. \n\
         \  If you seat them at a table that is just right, they will stay!"
       >>= fun () ->
-      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_unix.sleep 3. >>= fun () ->
       Lwt_io.printl
         "\n\
          You will be given a score based on how many parties you seat. \n\
@@ -298,9 +306,11 @@ let () =
         \  You will win if you seat all the parties in the queue. \n\
         \ Good luck! \n"
       >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () -> setup_num_tables () );
-  print_endline keys;
-  read_key ()
+      Lwt_unix.sleep 2. >>= fun () ->
+      setup_num_tables () >>= fun () ->
+      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_io.printl keys >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () -> read_key () )
 
 (* TODO: uncomment this for end of game *)
 (* >>= fun () -> Lwt_unix.sleep 1. >>= fun () -> Lwt_io.printl "Thank you for
