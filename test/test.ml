@@ -1,7 +1,7 @@
-open Table
+open Restaurant.Table
 
 module Rest = struct
-  type t = string ref array array ref
+  (* type t = string ref array array ref *)
 
   let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))
   let table_list = ref []
@@ -9,7 +9,10 @@ module Rest = struct
   let add_table_list id table = table_list := (id, table) :: !table_list
   let get_table id = List.assoc id !table_list
 
-  (* changes the first nth seats of table id to sym *)
+  exception SizeError
+  exception TableOccupied
+
+  (* changes the first nth sseats of table id to sym *)
   let change_seats_sym id n sym =
     for i = 0 to n - 1 do
       let x, y = List.nth (Table.coord_list (get_table id)) i in
@@ -157,12 +160,11 @@ module Rest = struct
      people at *)
   let seat_party num_people table_id =
     if Table.isReady (get_table table_id) then
-      if num_people > Table.capacity (get_table table_id) then
-        failwith "too much people"
+      if num_people > Table.capacity (get_table table_id) then raise SizeError
       else (
         Table.seat (get_table table_id) num_people;
         change_seats_sym table_id num_people "*")
-    else failwith "Table is not ready"
+    else raise TableOccupied
 
   let get_table_list = !table_list
   let get_coord_value x y = !(!restaurant_layout.(x).(y))

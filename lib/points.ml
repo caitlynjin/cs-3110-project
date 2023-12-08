@@ -84,7 +84,7 @@ module Points = struct
 
   (** Prints out the total number of points accumulated. *)
   let show_points () =
-    Lwt_io.printl
+    print_endline
       ("You have " ^ string_of_int (get_points ()) ^ " points so far!")
 
   (** Prints out a sequence of comments for the end of the game end of game,
