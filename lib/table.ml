@@ -4,7 +4,7 @@ module type Table = sig
   val make : int -> int -> t
   val make_with_coord : int -> int -> (int * int) list -> t
   val state : t -> string
-  val isReady : bool
+  val isReady : t -> bool
   val party_size : t -> int
   val capacity : t -> int
   val coord_list : t -> (int * int) list
@@ -37,6 +37,7 @@ module Table = struct
 
   let state table = table.current_state
   let clean table = table.current_state <- Ready
+  let isReady table = table.current_state = Ready
 
   let seat table p =
     table.current_state <- Occupied;
@@ -66,7 +67,7 @@ module ReadyTable : Table = struct
 
   (* let set_list table lst = table.coord_list = lst *)
   let state table = table.state
-  let isReady = true
+  let isReady _ = true
   let coord_list table = !(table.coord_list)
   let party_size _ = 0
   let capacity table = table.capacity
@@ -89,7 +90,7 @@ module OccupiedTable : Table = struct
 
   (* let set_list table lst = table.coord_list = lst *)
   let state table = table.state
-  let isReady = false
+  let isReady _ = false
   let party_size table = table.party_size
   let capacity table = table.capacity
   let coord_list table = !(table.coord_list)
@@ -112,7 +113,7 @@ module DirtyTable : Table = struct
 
   (* let set_list table lst = table.coord_list = lst *)
   let state table = table.state
-  let isReady = true
+  let isReady _ = true
   let party_size table = table.party_size
   let capacity table = table.capacity
   let coord_list table = !(table.coord_list)

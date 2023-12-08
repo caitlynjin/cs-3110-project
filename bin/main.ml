@@ -1,7 +1,7 @@
 open Lwt.Infix
 open Restaurant
-open Table
 open Menus
+open Rest
 
 (* let restaurant_data = (int * Table.t * TableQueue.t) list *)
 
@@ -242,8 +242,8 @@ let setup_num_tables () =
   print_endline
     "First, enter the number of tables for the width and the height of the \
      restaurant: ";
-  make_restaurant (read_int ());
-  display_filled_restaurant ();
+  Rest.make_restaurant (read_int ());
+  Rest.display_filled_restaurant ();
 
   (* just for testing purposes *)
   (* fill_restaurant 4 1; display_filled_restaurant (); fill_restaurant 3 5;
