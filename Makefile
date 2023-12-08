@@ -31,3 +31,6 @@ zip:
 clean:
 	dune clean
 	rm -f restaurant.zip
+
+doc:
+	dune build @doc
