@@ -1,3 +1,4 @@
 (library
  (name restaurant)
- (public_name Restaurant))
+ (public_name Restaurant)
+ (libraries lwt lwt.unix))
