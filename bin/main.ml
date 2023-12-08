@@ -4,24 +4,38 @@ open Table
 open Menus
 
 (* let restaurant_data = (int * Table.t * TableQueue.t) list *)
+
+(** The restaurant's layout, which is represented by a 2D array. *)
 let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))
+
+(** The list of tables represented by a 2D array of table id's the table itself. *)
 let table_list = ref []
+
+(** Sets the symbol [sym] to the coordinate at row [row] and column [col]. *)
 let set_coord_symbol row col sym = row.(col) <- ref sym
+
+(** Adds the table with the [id] to the list of tables [table_list]. *)
 let add_table_list id table = table_list := (id, table) :: !table_list
+
+(** Gets the table with the corresponding [id]. *)
 let get_table id = List.assoc id !table_list
 
-(* changes the first nth seats of table id to sym *)
+(* Changes the first [n]th seats of the table [id] to the following symbol
+   [sym]. *)
 let change_seats_sym id n sym =
   for i = 0 to n - 1 do
     let x, y = List.nth (Table.coord_list (get_table id)) i in
     set_coord_symbol !restaurant_layout.(x) y sym
   done
 
+(** The width of the restaurant. *)
 let width = ref 0
+
+(** The height of the restaurant. *)
 let height = ref 0
 
-(* prints out the table list such that "table #'s coordinates are (#,
-   #)(#,#)..." *)
+(** Prints out the table list such that "table #'s coordinates are (#,
+    #)(#,#)..." *)
 let _print_list () =
   let print_coord acc (h, w) =
     acc ^ "(" ^ string_of_int h ^ ", " ^ string_of_int w ^ ")"
@@ -35,6 +49,7 @@ let _print_list () =
   in
   List.iter print_entry !table_list
 
+(** A string containing all the valid commands for the game. *)
 let keys : string =
   "\n\
   \ Here are valid commands for the game: \n\
@@ -43,12 +58,18 @@ let keys : string =
   \ - \"help\" to see the valid key commands \n\
   \ - \"exit\" to quit the game \n"
 
+(** Reads the user input for an integer. If not, then console alerts that this
+    is an invalid input and continues reading for user input until valid. *)
 let rec read_int () =
   try int_of_string (read_line ())
   with Failure _ ->
     print_endline "Invalid input. Please enter an integer.";
     read_int ()
 
+(** Reads the user input for any of the valid commands for the game. If "help"
+    is entered, console displays the list of valid commands. If "exit" is
+    entered, exits the game. If an enter key is inputted, then calls the next
+    queue party. *)
 let rec read_key () =
   (* TODO: edit these instructions *)
   print_string "Insert a command here: ";
@@ -68,6 +89,7 @@ let rec read_key () =
     print_endline "Please press enter or type \"exit\" to quit. ";
     read_key ())
 
+(** Reads the user input and checks for the enter key. If not, then exits. *)
 let read_enter () =
   Lwt_io.read_line_opt Lwt_io.stdin >>= function
   | Some input -> if input = "" then Lwt.return () else exit 0
@@ -176,10 +198,10 @@ let make_restaurant num_tables =
   generate_row !restaurant_layout.(!height - 2) 1 (!width - 1) (ref " ");
   generate_row !restaurant_layout.(!height - 1) 0 !width (ref "-")
 
-(* fill_restaurant will modify the corresponding rows of table_id and place 'x's
-   around that table to represent the people in the party. [num_people] = the
-   number of x's to place around the table [table_id] = the table to place the
-   people at *)
+(** fill_restaurant will modify the corresponding rows of table_id and place
+    'x's around that table to represent the people in the party. [num_people] =
+    the number of x's to place around the table [table_id] = the table to place
+    the people at *)
 let _fill_restaurant num_people table_id =
   if num_people > Table.capacity (get_table table_id) then
     failwith "too much people"
@@ -187,6 +209,8 @@ let _fill_restaurant num_people table_id =
     Table.seat (get_table table_id) num_people;
     change_seats_sym table_id num_people "*")
 
+(** Prints the restaurant including the people that may or may not be seated in
+    the restaurant. *)
 let display_filled_restaurant () =
   (* prints everything out *)
   for i = 0 to !height - 1 do
@@ -213,6 +237,7 @@ let display_filled_restaurant () =
    0 to Array.length restaurant - 1 do print_string (!(restaurant.(i)) ^ "\n")
    done; print_string "\n \n"; () *)
 
+(** Creates and displays a restaurant with the user-specified number of tables. *)
 let setup_num_tables () =
   print_endline
     "First, enter the number of tables for the width and the height of the \
@@ -228,7 +253,7 @@ let setup_num_tables () =
   (* print_list (); *)
   Lwt.return ()
 
-(* running the game *)
+(** Runs the game. *)
 let () =
   Lwt_main.run
     ( Lwt_unix.sleep 1. >>= fun () ->
