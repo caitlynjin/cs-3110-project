@@ -167,7 +167,7 @@ let make_restaurant num_tables =
    around that table to represent the people in the party. [num_people] = the
    number of x's to place around the table [table_id] = the table to place the
    people at *)
-let fill_restaurant num_people table_id =
+let _fill_restaurant num_people table_id =
   if num_people > Table.capacity (get_table table_id) then
     failwith "too much people"
   else (
