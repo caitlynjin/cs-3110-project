@@ -1,3 +1,5 @@
+(** A module type that abstracts properties for all types of tables in the
+    restaurant. *)
 module type Table = sig
   type t
 
