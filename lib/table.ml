@@ -84,108 +84,86 @@ module Table = struct
   let add_list table x y = table.coord_list := (x, y) :: !(table.coord_list)
 end
 
-module ReadyTable : Table = struct
-  type t = {
-    state : string;
-    capacity : int;
-    coord_list : (int * int) list ref;
-  }
+(* module ReadyTable : Table = struct type t = { state : string; capacity : int;
+   coord_list : (int * int) list ref; }
 
-  (** Makes a table with the Ready state, a person capacity [c], and an empty
-      coordinate list for the seating of people. *)
-  let make _ c = { state = "Ready"; capacity = c; coord_list = ref [] }
+   (** Makes a table with the Ready state, a person capacity [c], and an empty
+   coordinate list for the seating of people. *) let make _ c = { state =
+   "Ready"; capacity = c; coord_list = ref [] }
 
-  (** The state of the table [table]. *)
-  let state table = table.state
+   (** The state of the table [table]. *) let state table = table.state
 
-  (** Returns whether the table is ready. *)
-  let isReady _ = true
+   (** Returns whether the table is ready. *) let isReady _ = true
 
-  (** Returns the coordinate list of the people seated at the table, which is
-      empty. *)
-  let coord_list _ = []
+   (** Returns the coordinate list of the people seated at the table, which is
+   empty. *) let coord_list _ = []
 
-  (** Returns the party size of the table, which is zero. *)
-  let party_size _ = 0
+   (** Returns the party size of the table, which is zero. *) let party_size _ =
+   0
 
-  (** Returns the person capacity of the table [table]. *)
-  let capacity table = table.capacity
-end
+   (** Returns the person capacity of the table [table]. *) let capacity table =
+   table.capacity end
 
-module OccupiedTable : Table = struct
-  type t = {
-    state : string;
-    party_size : int;
-    capacity : int;
-    coord_list : (int * int) list ref;
-  }
+   module OccupiedTable : Table = struct type t = { state : string; party_size :
+   int; capacity : int; coord_list : (int * int) list ref; }
 
-  (** Makes a table with the default Ready state, a person capacity [c], a party
-      size of [p], and an empty coordinate list for the seating of people. *)
-  let make p c =
-    { state = "Occupied"; party_size = p; capacity = c; coord_list = ref [] }
+   (** Makes a table with the default Ready state, a person capacity [c], a
+   party size of [p], and an empty coordinate list for the seating of people. *)
+   let make p c = { state = "Occupied"; party_size = p; capacity = c; coord_list
+   = ref [] }
 
-  (** Makes a table with people seated. The table has a default state of
-      Occupied, a party size of [p], a person capacity of [c], and a coordinate
-      list for the seating of people [lst]. *)
-  let make_with_coord p c lst =
-    { state = "Occupied"; party_size = p; capacity = c; coord_list = ref lst }
+   (** Makes a table with people seated. The table has a default state of
+   Occupied, a party size of [p], a person capacity of [c], and a coordinate
+   list for the seating of people [lst]. *) let make_with_coord p c lst = {
+   state = "Occupied"; party_size = p; capacity = c; coord_list = ref lst }
 
-  (** Returns the current state of the table [table]. *)
-  let state table = table.state
+   (** Returns the current state of the table [table]. *) let state table =
+   table.state
 
-  (** Returns whether the table is in the Ready state, which it is not. *)
-  let isReady _ = false
+   (** Returns whether the table is in the Ready state, which it is not. *) let
+   isReady _ = false
 
-  (** Returns the party size of the table [table]. *)
-  let party_size table = table.party_size
+   (** Returns the party size of the table [table]. *) let party_size table =
+   table.party_size
 
-  (** Returns the person capacity of the table [table]. *)
-  let capacity table = table.capacity
+   (** Returns the person capacity of the table [table]. *) let capacity table =
+   table.capacity
 
-  (** The coordinate list of the table [table], which is a list of integer pairs
-      that represent the positions around the table. *)
-  let coord_list table = !(table.coord_list)
+   (** The coordinate list of the table [table], which is a list of integer
+   pairs that represent the positions around the table. *) let coord_list table
+   = !(table.coord_list)
 
-  (** Adds a person to the coordinate ([x], [y]) at the table [table]. *)
-  let add_list table x y = table.coord_list := (x, y) :: !(table.coord_list)
-end
+   (** Adds a person to the coordinate ([x], [y]) at the table [table]. *) let
+   add_list table x y = table.coord_list := (x, y) :: !(table.coord_list) end
 
-module DirtyTable : Table = struct
-  type t = {
-    state : string;
-    party_size : int;
-    capacity : int;
-    coord_list : (int * int) list ref;
-  }
+   module DirtyTable : Table = struct type t = { state : string; party_size :
+   int; capacity : int; coord_list : (int * int) list ref; }
 
-  (** Makes a table with the default Ready state, a person capacity [c], a party
-      size of [p], and an empty coordinate list for the seating of people. *)
-  let make p c =
-    { state = "Dirty"; party_size = p; capacity = c; coord_list = ref [] }
+   (** Makes a table with the default Ready state, a person capacity [c], a
+   party size of [p], and an empty coordinate list for the seating of people. *)
+   let make p c = { state = "Dirty"; party_size = p; capacity = c; coord_list =
+   ref [] }
 
-  (** Makes a table with people seated. The table has a default state of
-      Occupied, a party size of [p], a person capacity of [c], and a coordinate
-      list for the seating of people [lst]. *)
-  let make_with_coord p c lst =
-    { state = "Occupied"; party_size = p; capacity = c; coord_list = ref lst }
+   (** Makes a table with people seated. The table has a default state of
+   Occupied, a party size of [p], a person capacity of [c], and a coordinate
+   list for the seating of people [lst]. *) let make_with_coord p c lst = {
+   state = "Occupied"; party_size = p; capacity = c; coord_list = ref lst }
 
-  (** Returns the current state of the table [table]. *)
-  let state table = table.state
+   (** Returns the current state of the table [table]. *) let state table =
+   table.state
 
-  (** Returns whether the table is in the Ready state, which it is not. *)
-  let isReady _ = false
+   (** Returns whether the table is in the Ready state, which it is not. *) let
+   isReady _ = false
 
-  (** Returns the size of the party at the table [table]. *)
-  let party_size table = table.party_size
+   (** Returns the size of the party at the table [table]. *) let party_size
+   table = table.party_size
 
-  (** Returns the person capacity of the table [table]. *)
-  let capacity table = table.capacity
+   (** Returns the person capacity of the table [table]. *) let capacity table =
+   table.capacity
 
-  (** Returns the coordinate list of the table [table], which is a list of
-      integer pairs that represent the positions around the table. *)
-  let coord_list table = !(table.coord_list)
+   (** Returns the coordinate list of the table [table], which is a list of
+   integer pairs that represent the positions around the table. *) let
+   coord_list table = !(table.coord_list)
 
-  (** Adds a person to the coordinate ([x], [y]) at the table [table]. *)
-  let add_list table x y = table.coord_list := (x, y) :: !(table.coord_list)
-end
+   (** Adds a person to the coordinate ([x], [y]) at the table [table]. *) let
+   add_list table x y = table.coord_list := (x, y) :: !(table.coord_list) end *)

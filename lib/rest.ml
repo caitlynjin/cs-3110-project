@@ -20,8 +20,8 @@ module Rest = struct
   (** Gets the table with the corresponding [id]. *)
   let get_table id = List.assoc id !table_list
 
-  (* Changes the first [n]th seats of the table [id] to the following symbol
-     [sym]. *)
+  (** Changes the first [n]th seats of the table [id] to the following symbol
+      [sym]. *)
   let change_seats_sym id n sym =
     for i = 0 to n - 1 do
       let x, y = List.nth (Table.coord_list (get_table id)) i in
