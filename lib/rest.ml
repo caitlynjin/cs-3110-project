@@ -3,6 +3,7 @@ open Table
 (** A model that lays out the restaurant user interface. *)
 module Rest = struct
   type t = string ref array array ref
+  (** Type representing the 2D array of tables. *)
 
   (** The restaurant's layout, which is represented by a 2D array. *)
   let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))

@@ -1,7 +1,8 @@
-(** A module type that abstracts properties for all types of tables in the
+(** Signature that abstracts properties for all types of tables in the
     restaurant. *)
 module type Table = sig
   type t
+  (** Type representing a table. *)
 
   val make : int -> int -> t
   (** Makes a new table with the corresponding coordinates. *)
@@ -22,7 +23,10 @@ module type Table = sig
   (** Returns the coordinate list of people seated at the table. *)
 end
 
+(** A model for a table at the restaurant, which includes many states and
+    actions to be performed on the table. *)
 module Table = struct
+  (** Type representing the multiple states for a table. *)
   type state =
     | Occupied
     | Ready
@@ -34,6 +38,8 @@ module Table = struct
     coord_list : (int * int) list ref;
     mutable party_size : int;
   }
+  (** Type representing a table with a state, capacity, coordinate list for the
+      people sitting at the table, and the party size. *)
 
   (** Makes a table with the default Ready state, a person capacity [c], a party
       size of zero, and an empty coordinate list for the seating of people. *)

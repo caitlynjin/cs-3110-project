@@ -1,6 +1,7 @@
 (** A model for waitlist queues. *)
 module WaitlistQueue = struct
   type t = int list
+  (** Type representing the list of party sizes in the queue. *)
 
   (** An empty waitlist queue. *)
   let empty = []
