@@ -6,6 +6,23 @@ open Table
 (* open Menus *)
 open Points
 
+(* TEST PLAN
+Manually tested parts:
+- print statements (instructions, etc)
+- timer (delay in instructions, duration of parties, etc)
+
+Automated tests:
+- queue functions
+- table functions
+- menu functions
+- points functions
+
+OUnit tested the Restaurant, Queue, Table, Menus, and Points modules. 
+Test cases were developed using glass box testing to ensure maximum coverage. 
+Therefore, more possible playouts of the game are tested and ensured that they 
+run the way we intend them to.
+ *)
+
 let queue_tests =
   [
     ( "empty queue" >:: fun _ ->
