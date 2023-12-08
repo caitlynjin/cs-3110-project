@@ -1,20 +1,28 @@
 open Lwt.Infix
 
+(** A model for keeping track of points within the game. *)
 module Points = struct
   (* TODO: PASS IN NAME FROM MENUS.ML *)
+
+  (** The name of the restaurant. *)
   let name = "placeholder"
 
-  (* point system to determine the performance of the user during the game *)
+  (* A type for the point system to determine the performance of the user during
+     the game. *)
   type points = {
     mutable queue_performance : int;
     mutable meals : int;
     mutable profits : int;
   }
 
+  (** A record containing the points in the game in the categories for queue
+      performance, meals, and profits. *)
   let game_pts = { queue_performance = 0; meals = 0; profits = 0 }
 
   (* TODO: CALL THIS FUNCTION WHENEVER A PARTY IS SAT *)
-  (* calculates points based on how queue is managed *)
+
+  (** Returns the calculated points based on how queue is managed, using the
+      size of the party [party_size] and the wait time [wait_time]. *)
   let parties_points (party_size : int) (wait_time : int) =
     (* points calculated from how long party had to wait in queue, weighted by
        party size *)
@@ -27,7 +35,10 @@ module Points = struct
     game_pts.queue_performance <- game_pts.queue_performance + !wait_points
 
   (* TODO: CALL THIS FUNCTION WHENEVER A PARTY IS DONE AT THEIR TABLE *)
-  (* calculates points based on party experience at table*)
+
+  (** Returns the calculated points based on party experience at table, using
+      the size of the party [party_size], the time it took food to be deliever
+      [food_time], and the number of dishes [num_dishes]. *)
   let meals_points (party_size : int) (food_time : int) (num_dishes : int)
       (duration_at_table : int) =
     (* points calculated for how fast food are delivered to table (shorter is
@@ -45,9 +56,12 @@ module Points = struct
     else duration := 5 * party_size;
 
     (* update points *)
-    game_pts.meals <- (game_pts.meals + !food_points + !duration)
+    game_pts.meals <- game_pts.meals + !food_points + !duration
 
   (* TODO: CALL THIS FUNCTION WHENEVER A PARTY IS DONE AT THEIR TABLE *)
+
+  (** Takes the points calculated from total profits [total] and updates the
+      game points for profits. *)
   let profits_points (total : float) =
     (* points calculated from total profits *)
     let profit_points = total *. 25. in
@@ -55,24 +69,26 @@ module Points = struct
     (* update points *)
     game_pts.profits <- game_pts.profits + int_of_float profit_points
 
-  (* returns total points accumulated from managing the queue *)
+  (** Returns the total points accumulated from managing the queue. *)
   let get_queue () = game_pts.queue_performance
 
-  (* returns total points accumulated from managing each table *)
+  (** Returns the total points accumulated from managing each table. *)
   let get_meals () = game_pts.meals
 
-  (* returns total points accumulated from profits *)
+  (** Returns the total points accumulated from profits. *)
   let get_profits () = game_pts.profits
 
-  (* returns total points accumulated *)
+  (** Returns the total points accumulated. *)
   let get_points () =
     game_pts.queue_performance + game_pts.meals + game_pts.profits
 
+  (** Prints out the total number of points accumulated. *)
   let show_points () =
     Lwt_io.printl
       ("You have " ^ string_of_int (get_points ()) ^ " points so far!")
 
-  (* to display at end of game- wrap up with final points *)
+  (** Prints out a sequence of comments for the end of the game end of game,
+      which wraps up the game with a display of final points. *)
   let print_points () =
     Lwt_io.printl "Let's see how u did!" >>= fun () ->
     Lwt_unix.sleep 2. >>= fun () ->
