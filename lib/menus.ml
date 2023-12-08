@@ -1,10 +1,7 @@
 open Lwt.Infix
+open Yojson.Basic.Util
 
-(** A model that sets up the restaurant, prompting the player for the name of
-    the restaurant, cuisine, and menu. *)
 module Menus = struct
-  (* TODO: CALL THESE BEFORE ASKING PLAYER FOR TABLE SIZE *)
-
   (** The default name of the restaurant in case the player doesn't input one. *)
   let restaurant_name = ref "Default Restaurant Name"
 
@@ -14,6 +11,9 @@ module Menus = struct
     ingredients : string list;
     make_time : int;
   }
+
+  type menu = (string * dish list) list
+
   (** Type representing a dish, which includes a name, price, ingredients, and
       the time it takes to make the dish. *)
 
@@ -27,6 +27,7 @@ module Menus = struct
   let cuisine_list : string list =
     [
       "Chinese";
+      "Filipino";
       "Italian";
       "American";
       "Indian";
@@ -34,47 +35,48 @@ module Menus = struct
       "Korean";
       "Spanish";
       "French";
-      "Greece";
+      "Greek";
       "Thai";
     ]
 
   (** A string of suggestions for Chinese style dishes. *)
-  let chinese_dishes_suggestions = "Dumplings, Fried Rice, Noodles, Soup, Tofu"
+  let chinese_dish_suggestions = "Dumplings, Fried Rice, Noodles, Soup, Tofu"
+
+  (** A string of suggestions for Filipino style dishes. *)
+  let filipino_dish_suggestions = "Adobo, Sinigang, Lumpia, Pancit, Sisig"
 
   (** A string of suggestions for Japanese style dishes. *)
-  let japanese_dishes_suggestions = "Sushi, Ramen, Udon, Tempura, Sashimi"
+  let japanese_dish_suggestions = "Sushi, Ramen, Udon, Tempura, Sashimi"
 
   (** A string of suggestions for American style dishes. *)
-  let american_dishes_suggestions = "Burgers, Steaks, Sandwiches, Fries, Pizza"
+  let american_dish_suggestions = "Burgers, Steaks, Sandwiches, Fries, Pizza"
 
   (** A string of suggestions for Italian style dishes. *)
-  let italian_dishes_suggestions = "Pasta, Pizza, Risotto, Lasagna, Gnocchi"
+  let italian_dish_suggestions = "Pasta, Pizza, Risotto, Lasagna, Gnocchi"
 
   (** A string of suggestions for Indian style dishes. *)
-  let indian_dishes_suggestions =
+  let indian_dish_suggestions =
     "Curry, Naan, Samosas, Tandoori Chicken, Biryani"
 
   (** A string of suggestions for Korean style dishes. *)
-  let korean_dishes_suggestions =
-    "Bibimbap, Bulgogi, Kimchi, Tteokbokki, Japchae"
+  let korean_dish_suggestions = "Bibimbap, Bulgogi, Kimchi, Tteokbokki, Japchae"
 
   (** A string of suggestions for Spanish style dishes. *)
-  let spanish_dishes_suggestions =
+  let spanish_dish_suggestions =
     "Paella, Gazpacho, Tortilla, Croquettes, Patatas Bravas"
 
   (** A string of suggestions for French style dishes. *)
-  let french_dishes_suggestions =
+  let french_dish_suggestions =
     "Croissants, Baguettes, Ratatouille, Coq au Vin, Cassoulet"
 
-  (** A string of suggestions for Greece style dishes. *)
-  let greece_dishes_suggestions =
-    "Moussaka, Souvlaki, Gyros, Spanakopita, Baklava"
+  (** A string of suggestions for Greek style dishes. *)
+  let greek_dish_suggestions = "Moussaka, Souvlaki, Gyros, Spanakopita, Baklava"
 
   (** A string of suggestions for Thai style dishes. *)
-  let thai_dishes_suggestions =
+  let thai_dish_suggestions =
     "Pad Thai, Tom Yum, Som Tum, Khao Pad, Massaman Curry"
 
-  (** The default menu for a Chinese style cuisines. *)
+  (** The default menu for Chinese-style cuisine. *)
   let chinese_set_menu =
     [
       {
@@ -109,7 +111,42 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a Japanese style cuisines. *)
+  (** The default menu for Filipino-style cuisine. *)
+  let filipino_set_menu =
+    [
+      {
+        name = "Adobo";
+        price = 10.99;
+        ingredients = [ "Chicken"; "Vinegar"; "Bay Leaves" ];
+        make_time = 5;
+      };
+      {
+        name = "Sinigang";
+        price = 12.99;
+        ingredients = [ "Pork"; "Tamarind"; "Broth" ];
+        make_time = 6;
+      };
+      {
+        name = "Lumpia";
+        price = 8.99;
+        ingredients = [ "Noodles"; "Meat"; "Vegetables" ];
+        make_time = 7;
+      };
+      {
+        name = "Pancit";
+        price = 9.99;
+        ingredients = [ "Noodles"; "Meat"; "Vegetables" ];
+        make_time = 9;
+      };
+      {
+        name = "Sisig";
+        price = 11.99;
+        ingredients = [ "Pork"; "Oil"; "Jalapenos" ];
+        make_time = 4;
+      };
+    ]
+
+  (** The default menu for Japanese-style cuisine. *)
   let japanese_set_menu =
     [
       {
@@ -144,7 +181,7 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a American style cuisines. *)
+  (** The default menu for American-style cuisine. *)
   let american_set_menu =
     [
       {
@@ -179,7 +216,7 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a Korean style cuisines. *)
+  (** The default menu for Korean-style cuisine. *)
   let korean_set_menu =
     [
       {
@@ -214,7 +251,7 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a Italian style cuisines. *)
+  (** The default menu for Italian-style cuisine. *)
   let italian_set_menu =
     [
       {
@@ -249,7 +286,7 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a Indian style cuisines. *)
+  (** The default menu for Indian-style cuisine. *)
   let indian_set_menu =
     [
       {
@@ -284,7 +321,7 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a Spanish style cuisines. *)
+  (** The default menu for Spanish-style cuisine. *)
   let spanish_set_menu =
     [
       {
@@ -319,7 +356,7 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a French style cuisines. *)
+  (** The default menu for French-style cuisine. *)
   let french_set_menu =
     [
       {
@@ -354,8 +391,8 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a Greece style cuisines. *)
-  let greece_set_menu =
+  (** The default menu for Greek-style cuisine. *)
+  let greek_set_menu =
     [
       {
         name = "Moussaka";
@@ -389,7 +426,7 @@ module Menus = struct
       };
     ]
 
-  (** The default menu for a Thai style cuisines. *)
+  (** The default menu for Thai-style cuisine. *)
   let thai_set_menu =
     [
       {
@@ -464,18 +501,18 @@ module Menus = struct
     Lwt_unix.sleep 1. >>= fun () ->
     let input = read_line () in
     let cuisine_announcement = "\nThe cuisine style of your restaurant is " in
-    let input = String.lowercase_ascii input in
+    let input = String.capitalize_ascii input in
     if
-      input = "chinese" || input = "italian" || input = "american"
-      || input = "indian" || input = "japanese" || input = "korean"
-      || input = "spanish" || input = "french" || input = "greece"
-      || input = "thai"
+      input = "Chinese" || input = "Filipino" || input = "Italian"
+      || input = "American" || input = "Indian" || input = "Japanese"
+      || input = "Korean" || input = "Spanish" || input = "French"
+      || input = "Greek" || input = "Thai"
     then begin
       cuisine := input;
       print_endline (cuisine_announcement ^ !cuisine ^ ". \n");
       Lwt_unix.sleep 1.
     end
-    else if input = "random" || input = "exit" then begin
+    else if input = "random" then begin
       let random_cuisine =
         Random.self_init ();
         List.nth cuisine_list (Random.int (List.length cuisine_list))
@@ -484,6 +521,7 @@ module Menus = struct
       print_endline (cuisine_announcement ^ !cuisine ^ ".");
       Lwt_unix.sleep 2.
     end
+    else if input = "exit" then Lwt.return (exit 0)
     else begin
       print_endline
         "\nPlease enter a valid cuisine style, or type \"exit\" to quit. ";
@@ -494,16 +532,17 @@ module Menus = struct
       dishes for their chosen cuisine as suggestions. *)
   let suggest_menus cuisine =
     let cuisine = String.lowercase_ascii cuisine in
-    if cuisine = "chinese" then chinese_dishes_suggestions
-    else if cuisine = "japanese" then japanese_dishes_suggestions
-    else if cuisine = "american" then american_dishes_suggestions
-    else if cuisine = "italian" then italian_dishes_suggestions
-    else if cuisine = "indian" then indian_dishes_suggestions
-    else if cuisine = "korean" then korean_dishes_suggestions
-    else if cuisine = "spanish" then spanish_dishes_suggestions
-    else if cuisine = "french" then french_dishes_suggestions
-    else if cuisine = "greece" then greece_dishes_suggestions
-    else if cuisine = "thai" then thai_dishes_suggestions
+    if cuisine = "chinese" then chinese_dish_suggestions
+    else if cuisine = "filipino" then filipino_dish_suggestions
+    else if cuisine = "japanese" then japanese_dish_suggestions
+    else if cuisine = "american" then american_dish_suggestions
+    else if cuisine = "italian" then italian_dish_suggestions
+    else if cuisine = "indian" then indian_dish_suggestions
+    else if cuisine = "korean" then korean_dish_suggestions
+    else if cuisine = "spanish" then spanish_dish_suggestions
+    else if cuisine = "french" then french_dish_suggestions
+    else if cuisine = "greek" then greek_dish_suggestions
+    else if cuisine = "thai" then thai_dish_suggestions
     else failwith "Invalid cuisine"
 
   (** If player wants a pre-determined menu, set it based on the cuisine they
@@ -511,6 +550,7 @@ module Menus = struct
   let set_menu input =
     let input = String.lowercase_ascii input in
     if input = "chinese" then chinese_set_menu
+    else if input = "filipino" then filipino_set_menu
     else if input = "japanese" then japanese_set_menu
     else if input = "american" then american_set_menu
     else if input = "italian" then italian_set_menu
@@ -518,7 +558,7 @@ module Menus = struct
     else if input = "korean" then korean_set_menu
     else if input = "spanish" then spanish_set_menu
     else if input = "french" then french_set_menu
-    else if input = "greece" then greece_set_menu
+    else if input = "greek" then greek_set_menu
     else if input = "thai" then thai_set_menu
     else failwith "Invalid cuisine"
 
@@ -550,9 +590,11 @@ module Menus = struct
   let rec make_menu () =
     let input = read_line () in
     if input = "standard" then begin
-      restaurant_menu := set_menu !cuisine
-      (* print_endline ("The menu for your " ^ !cuisine ^ " restaurant is: \n" ^
-         string_of_list (List.map (fun x -> x.name) !restaurant_menu) ^ ".") *);
+      restaurant_menu := set_menu !cuisine;
+      print_endline
+        ("The menu for your " ^ !cuisine ^ " restaurant is: \n"
+        ^ string_of_list (List.map (fun x -> x.name) !restaurant_menu)
+        ^ ".");
       Lwt.return ()
     end
     else if input = "suggest" then begin
@@ -602,11 +644,60 @@ module Menus = struct
       in
       set_dishes
 
+  let json_to_menu json =
+    match json with
+    | `List dishes ->
+        List.map
+          (fun attrs ->
+            let name = member "name" attrs |> to_string in
+            let price = member "price" attrs |> to_float in
+            let ingredients =
+              member "ingredients" attrs |> to_list |> filter_string
+            in
+            let make_time = member "make_time" attrs |> to_int in
+            { name; price; ingredients; make_time })
+          dishes
+    | `Assoc [ (_, `List dishes) ] ->
+        List.map
+          (fun attrs ->
+            let name = member "name" attrs |> to_string in
+            let price = member "price" attrs |> to_float in
+            let ingredients =
+              member "ingredients" attrs |> to_list |> filter_string
+            in
+            let make_time = member "make_time" attrs |> to_int in
+            { name; price; ingredients; make_time })
+          dishes
+    | _ -> failwith "Invalid JSON format"
+
+  (* let filter_string = function | `String s -> s | _ -> failwith "Unexpected
+     JSON type" *)
+
+  (* let _json_to_menu json = let rec extract_dish dish = match dish with |
+     `Assoc attrs -> let name = List.assoc "name" attrs |> float_of_string |>
+     filter_string in let price = List.assoc "price" attrs in let ingredients =
+     List.assoc "ingredients" attrs |> filter_string in let make_time =
+     List.assoc "make_time" attrs |> to_int in { name; price; ingredients;
+     make_time } | _ -> failwith "Invalid JSON format for dish" in
+
+     match json with | `Assoc menu -> List.map (fun (menu_type, dishes) -> let
+     dishes_list = match dishes with | `List dish_list -> List.map extract_dish
+     dish_list | _ -> failwith "Invalid JSON format for dishes" in (menu_type,
+     dishes_list)) menu | _ -> failwith "Invalid JSON format for menu" *)
+
   (** A sequence of prompts for the user to set up the restaurant, including the
       restaurant name, type, and menu. *)
   let set_up_restaurant () =
+    (* let current_directory = Sys.getcwd () in print_endline ("Current Working
+       Directory: " ^ current_directory); let json_string =
+       Yojson.Basic.from_file "lib/menus.json" in print_endline
+       (Yojson.Basic.pretty_to_string json_string); let menu = json_to_menu
+       json_string in (* Print the menu *) List.iter (fun dish -> print_endline
+       ("Name: " ^ dish.name ^ "Price: " ^ string_of_float dish.price ^
+       "\nIngredients: " ^ String.concat ", " dish.ingredients ^ "\nMake Time: "
+       ^ string_of_int dish.make_time ^ "\n\n")) menu; *)
     Lwt_io.printl "Let's set up our restaurant!" >>= fun () ->
-    Lwt_unix.sleep 2. >>= fun () ->
+    Lwt_unix.sleep 1. >>= fun () ->
     name_res () >>= fun () ->
     read_key () >>= fun () ->
     Lwt_unix.sleep 2. >>= fun () ->
@@ -625,7 +716,7 @@ module Menus = struct
     Lwt_io.printl "\nYour full menu is:" >>= fun () ->
     Lwt_unix.sleep 1. >>= fun () ->
     Lwt_io.printl menu_str >>= fun () ->
-    Lwt_unix.sleep 2. >>= fun () ->
+    Lwt_unix.sleep 7. >>= fun () ->
     Lwt_io.printl "Now, let's open the restaurant! \n" >>= fun () ->
     Lwt_unix.sleep 2.
 end

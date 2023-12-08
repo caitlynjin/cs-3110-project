@@ -22,7 +22,7 @@ module type Table = sig
   val capacity : t -> int
   (** Returns the person capacity of the table. *)
 
-  val coord_list : t option -> (int * int) list
+  val coord_list : t -> (int * int) list
   (** Returns the coordinate list of people seated at the table. *)
 
   val add_list : t -> int -> int -> unit
@@ -99,10 +99,7 @@ module Table = struct
 
   (** Returns the coordinate list of the table [table], which is a list of
       integer pairs that represent the positions around the table. *)
-  let coord_list table =
-    match table with
-    | Some t -> !(t.coord_list)
-    | None -> raise Not_found
+  let coord_list table = !(table.coord_list)
 
   (** Adds a person to the coordinate ([x], [y]) at the table [table]. *)
   let add_list table x y = table.coord_list := (x, y) :: !(table.coord_list)
@@ -130,10 +127,7 @@ module ReadyTable : Table = struct
 
   (** Returns the coordinate list of the table [table], which is a list of
       integer pairs that represent the positions around the table. *)
-  let coord_list table =
-    match table with
-    | Some t -> !(t.coord_list)
-    | None -> raise Not_found
+  let coord_list table = !(table.coord_list)
 
   (** Returns the party size of the table, which is zero. *)
   let party_size _ = 0
@@ -172,10 +166,7 @@ module OccupiedTable : Table = struct
 
   (** Returns the coordinate list of the table [table], which is a list of
       integer pairs that represent the positions around the table. *)
-  let coord_list table =
-    match table with
-    | Some t -> !(t.coord_list)
-    | None -> raise Not_found
+  let coord_list table = !(table.coord_list)
 
   (** Returns the state of the table as a string **)
   let string_of_state _ = "Occupied"
@@ -214,10 +205,7 @@ module DirtyTable : Table = struct
 
   (** Returns the coordinate list of the table [table], which is a list of
       integer pairs that represent the positions around the table. *)
-  let coord_list table =
-    match table with
-    | Some t -> !(t.coord_list)
-    | None -> raise Not_found
+  let coord_list table = !(table.coord_list)
 
   (** Adds a person to the coordinate ([x], [y]) at the table [table]. *)
   let add_list table x y = table.coord_list := (x, y) :: !(table.coord_list)

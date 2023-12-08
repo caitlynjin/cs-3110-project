@@ -1,10 +1,16 @@
+(* TEST PLAN: Manually tested parts: - print statements (instructions, etc) -
+   timer (delay in instructions, duration of parties, etc) Automated tests: -
+   queue functions - table functions - menu functions - points functions OUnit
+   tested the Restaurant, Queue, Table, Menus, and Points modules. Test cases
+   were developed using glass box testing to ensure maximum coverage. Therefore,
+   more possible playouts of the game are tested and ensured that they run the
+   way we intend them to. *)
+
 open OUnit2
 open Restaurant
 open Queue
 open Table
 open Rest
-
-(* open Menus *)
 open Points
 
 let queue_tests =
@@ -48,7 +54,7 @@ let table_tests =
       assert_equal 3 (ReadyTable.capacity ready_table) );
     ( "ready table party size" >:: fun _ ->
       assert_equal 0 (ReadyTable.party_size ready_table) );
-    ( "ready table is ready" >:: fun _ ->
+    ( "ready table\n       is ready" >:: fun _ ->
       assert_equal true (ReadyTable.isReady ready_table) );
     ( "occupied table state" >:: fun _ ->
       assert_equal "Occupied" (OccupiedTable.state occupied_table) );
@@ -64,7 +70,7 @@ let table_tests =
       assert_equal 4 (DirtyTable.capacity dirty_table) );
     ( "dirty table party size" >:: fun _ ->
       assert_equal 2 (DirtyTable.party_size dirty_table) );
-    ( "dirty table is ready" >:: fun _ ->
+    ( "dirty table\n       is ready" >:: fun _ ->
       assert_equal true (DirtyTable.isReady dirty_table) );
   ]
 
@@ -178,7 +184,7 @@ let sixteen_table_coord_tests =
     ( "sixteen tables table 7 coord" >:: fun _ ->
       assert_equal
         (Rest.make_restaurant 4;
-         Some (Rest.get_table 7 |> Table.coord_list)
+         Rest.get_table 7 |> Table.coord_list)
         [ (9, 22); (8, 24); (8, 20); (7, 22) ] );
     ( "sixteen tables table 8 coord" >:: fun _ ->
       assert_equal

@@ -9,12 +9,24 @@ module Rest = struct
   let add_table_list id table = table_list := (id, table) :: !table_list
   let get_table id = List.assoc id !table_list
 
-  (* changes the first nth seats of table id to sym *)
+  exception SizeError
+  exception TableOccupied
+  exception TableNotFound
+
+  (** Changes the first [n]th seats of the table [id] to the following symbol
+      [sym]. *)
   let change_seats_sym id n sym =
-    for i = 0 to n - 1 do
-      let x, y = List.nth (Table.coord_list (get_table id)) i in
-      set_coord_symbol !restaurant_layout.(x) y sym
-    done
+    try
+      let table = get_table id in
+      if n > 4 then failwith ("Error" ^ string_of_int n)
+      else if List.length (Table.coord_list table) = 0 then
+        failwith "Error list is 0 "
+      else
+        for i = 0 to n - 1 do
+          let x, y = List.nth (Table.coord_list table) i in
+          set_coord_symbol !restaurant_layout.(x) y sym
+        done
+    with Not_found -> raise TableNotFound
 
   let width = ref 0
   let height = ref 0
@@ -27,7 +39,7 @@ module Rest = struct
 
     (* creates the tables *)
     for n = 1 to num_tables * num_tables do
-      add_table_list n (Some (Table.make 4 4))
+      add_table_list n (Table.make 4 4)
     done;
 
     let current_table = ref 1 in
@@ -73,6 +85,7 @@ module Rest = struct
       ((* sets the left border of the row *)
        row.(0) <- ref "|";
        row.(1) <- ref " ";
+
        (* manually does the | | thing *)
        let i = ref 2 in
        while !i < width - 8 do
@@ -131,7 +144,9 @@ module Rest = struct
       print_string "\n"
     done;
     (* where print queue starts *)
-    for _ = 0 to Random.int 10 do
+    print_string "Current Queue: ";
+    let queue_length = 5 + Random.int 10 in
+    for _ = 0 to queue_length do
       print_string "* "
     done;
     print_endline "\n"
@@ -156,11 +171,28 @@ module Rest = struct
      number of x's to place around the table [table_id] = the table to place the
      people at *)
   let seat_party num_people table_id =
-    if Table.isReady (get_table table_id) then
-      if num_people > Table.capacity (get_table table_id) then
-        failwith "too much people"
-      else (
-        Table.seat (get_table table_id) num_people;
-        change_seats_sym table_id num_people "*")
-    else failwith "Table is not ready"
+    try
+      let table = get_table table_id in
+      if Table.isReady table then
+        if num_people > Table.capacity table then raise SizeError
+        else (
+          Table.seat table num_people;
+          change_seats_sym table_id num_people "*")
+      else raise TableOccupied
+    with Not_found -> raise TableNotFound
+
+  (** Modifies the corresponding rows of table_id and place '-'s or '|'s
+      correspondinly around that table where people ('*') once were to represent
+      the people in the party leaving and the table being cleared. [table_id] =
+      the table to clear the people from *)
+  let finish_eating id = Table.finish (get_table id)
+
+  (** Modifies the corresponding table [id] to Ready *)
+  let clean_table id = Table.clean (get_table id)
+
+  (** returns the table list *)
+  let get_table_list = !table_list
+
+  (** returns the symbol at coordinate [x] [y] *)
+  let get_coord_value x y = !(!restaurant_layout.(x).(y))
 end
