@@ -47,7 +47,8 @@ let table_tests =
       assert_equal 3 (ReadyTable.capacity ready_table) );
     ( "ready table party size" >:: fun _ ->
       assert_equal 0 (ReadyTable.party_size ready_table) );
-    ("ready table is ready" >:: fun _ -> assert_equal true ReadyTable.isReady);
+    ( "ready table is ready" >:: fun _ ->
+      assert_equal true (ReadyTable.isReady ready_table) );
     ( "occupied table state" >:: fun _ ->
       assert_equal "Occupied" (OccupiedTable.state occupied_table) );
     ( "occupied table capacity" >:: fun _ ->
@@ -55,14 +56,15 @@ let table_tests =
     ( "occupied table party size" >:: fun _ ->
       assert_equal 4 (OccupiedTable.party_size occupied_table) );
     ( "occupied table is ready" >:: fun _ ->
-      assert_equal false OccupiedTable.isReady );
+      assert_equal false (OccupiedTable.isReady occupied_table) );
     ( "dirty table state" >:: fun _ ->
       assert_equal "Dirty" (DirtyTable.state dirty_table) );
     ( "dirty table capacity" >:: fun _ ->
       assert_equal 4 (DirtyTable.capacity dirty_table) );
     ( "dirty table party size" >:: fun _ ->
       assert_equal 2 (DirtyTable.party_size dirty_table) );
-    ("dirty table is ready" >:: fun _ -> assert_equal true DirtyTable.isReady);
+    ( "dirty table is ready" >:: fun _ ->
+      assert_equal true (DirtyTable.isReady dirty_table) );
   ]
 
 (* let menu_test = [ ("menu test" >:: fun _ -> assert_equal "" !Menus.cuisine)
