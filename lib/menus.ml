@@ -1,29 +1,31 @@
 open Lwt.Infix
 
+(** A model that sets up the restaurant, prompting the player for the name of
+    the restaurant, cuisine, and menu. *)
 module Menus = struct
-  (* SETTING UP THE RESTAURANT: prompting player for the name of the restaurant,
-     cuisine, and menu. *)
-
   (* TODO: CALL THESE BEFORE ASKING PLAYER FOR TABLE SIZE *)
 
-  (* default name in case player doesn't input one.. (like clicking enter w/o
-     typing anything) *)
+  (** The default name of the restaurant in case the player doesn't input one. *)
   let restaurant_name = ref "Default Restaurant Name"
 
-  (* dishes type *)
   type dish = {
     name : string;
     price : float;
     ingredients : string list;
     make_time : int;
   }
+  (** The type for a dish, which contains a name, price, ingredients, and the
+      time it takes to make the dish. *)
 
   (* type menu = dish list *)
 
+  (** The cuisine type for the restaurant, which is a string. *)
   let cuisine = ref ""
+
+  (** The restaurants menu, which is a list of dishes. *)
   let restaurant_menu = ref []
 
-  (* list of cuisines that player can choose from *)
+  (** A list of cuisines that the user can choose from. *)
   let cuisine_list : string list =
     [
       "Chinese";
@@ -38,31 +40,43 @@ module Menus = struct
       "Thai";
     ]
 
-  (* suggestions for dishes *)
+  (** A string of suggestions for Chinese style dishes. *)
   let chinese_dishes_suggestions = "Dumplings, Fried Rice, Noodles, Soup, Tofu"
+
+  (** A string of suggestions for Japanese style dishes. *)
   let japanese_dishes_suggestions = "Sushi, Ramen, Udon, Tempura, Sashimi"
+
+  (** A string of suggestions for American style dishes. *)
   let american_dishes_suggestions = "Burgers, Steaks, Sandwiches, Fries, Pizza"
+
+  (** A string of suggestions for Italian style dishes. *)
   let italian_dishes_suggestions = "Pasta, Pizza, Risotto, Lasagna, Gnocchi"
 
+  (** A string of suggestions for Indian style dishes. *)
   let indian_dishes_suggestions =
     "Curry, Naan, Samosas, Tandoori Chicken, Biryani"
 
+  (** A string of suggestions for Korean style dishes. *)
   let korean_dishes_suggestions =
     "Bibimbap, Bulgogi, Kimchi, Tteokbokki, Japchae"
 
+  (** A string of suggestions for Spanish style dishes. *)
   let spanish_dishes_suggestions =
     "Paella, Gazpacho, Tortilla, Croquettes, Patatas Bravas"
 
+  (** A string of suggestions for French style dishes. *)
   let french_dishes_suggestions =
     "Croissants, Baguettes, Ratatouille, Coq au Vin, Cassoulet"
 
+  (** A string of suggestions for Greece style dishes. *)
   let greece_dishes_suggestions =
     "Moussaka, Souvlaki, Gyros, Spanakopita, Baklava"
 
+  (** A string of suggestions for Thai style dishes. *)
   let thai_dishes_suggestions =
     "Pad Thai, Tom Yum, Som Tum, Khao Pad, Massaman Curry"
 
-  (* pre-determined menus *)
+  (** The default menu for a Chinese style cuisines. *)
   let chinese_set_menu =
     [
       {
@@ -97,6 +111,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a Japanese style cuisines. *)
   let japanese_set_menu =
     [
       {
@@ -131,6 +146,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a American style cuisines. *)
   let american_set_menu =
     [
       {
@@ -165,6 +181,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a Korean style cuisines. *)
   let korean_set_menu =
     [
       {
@@ -199,6 +216,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a Italian style cuisines. *)
   let italian_set_menu =
     [
       {
@@ -233,6 +251,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a Indian style cuisines. *)
   let indian_set_menu =
     [
       {
@@ -267,6 +286,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a Spanish style cuisines. *)
   let spanish_set_menu =
     [
       {
@@ -301,6 +321,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a French style cuisines. *)
   let french_set_menu =
     [
       {
@@ -335,6 +356,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a Greece style cuisines. *)
   let greece_set_menu =
     [
       {
@@ -369,6 +391,7 @@ module Menus = struct
       };
     ]
 
+  (** The default menu for a Thai style cuisines. *)
   let thai_set_menu =
     [
       {
@@ -403,7 +426,7 @@ module Menus = struct
       };
     ]
 
-  (* turn list into string *)
+  (** Converts a list into string. *)
   let string_of_list lst =
     let rec string_of_list_helper lst acc =
       match lst with
@@ -414,7 +437,8 @@ module Menus = struct
     | [] -> ""
     | h :: t -> string_of_list_helper t h
 
-  (* get input to name the restaurant *)
+  (** Reads user input for the name of the restaurant. Modifies the name of the
+      restaurant to the user input. *)
   let name_res () =
     print_endline "What would you like to name your restaurant?";
     let input = read_line () in
@@ -422,12 +446,16 @@ module Menus = struct
     print_endline ("\n Your restaurant is called " ^ input ^ "! \n");
     Lwt_unix.sleep 2.
 
+  (** Reads the user input for a float type. If not, prints in console that it
+      is invalid and continues reading for user input until valid. *)
   let rec read_float () =
     try float_of_string (read_line ())
     with Failure _ ->
       print_endline "Invalid input. Please enter a number.";
       read_float ()
 
+  (** Prompts the user to choose a cuistine type for the restaurant, and
+      continues to read for a valid input unless the user inputs exit. *)
   let rec read_key () =
     Lwt_io.printl
       ("Next, choose a type of cuisine for your restaurant, from these \
@@ -463,8 +491,8 @@ module Menus = struct
       read_key ()
     end
 
-  (* if a player wants ideas for what dishes to put, returns a list of possible
-     dishes for their chosen cuisine *)
+  (** If a player wants ideas for what dishes to put, returns a list of possible
+      dishes for their chosen cuisine as suggestions. *)
   let suggest_menus cuisine =
     let cuisine = String.lowercase_ascii cuisine in
     if cuisine = "chinese" then chinese_dishes_suggestions
@@ -479,8 +507,8 @@ module Menus = struct
     else if cuisine = "thai" then thai_dishes_suggestions
     else failwith "Invalid cuisine"
 
-  (* if player wants a pre-determined menu, set it based on the cuisine they
-     have chosen. *)
+  (** If player wants a pre-determined menu, set it based on the cuisine they
+      have chosen. Otherwise, fails with an invalid cuisine. *)
   let set_menu input =
     let input = String.lowercase_ascii input in
     if input = "chinese" then chinese_set_menu
@@ -495,7 +523,8 @@ module Menus = struct
     else if input = "thai" then thai_set_menu
     else failwith "Invalid cuisine"
 
-  (* adds dish to menu *)
+  (** Adds the dish to the restaurant menu, which contains a name [dName], price
+      [dPrice], ingredients [dIngredients], and make time [dTime]. *)
   let make_dish dName dPrice dIngredients dTime =
     restaurant_menu :=
       {
@@ -506,7 +535,7 @@ module Menus = struct
       }
       :: !restaurant_menu
 
-  (* turns menu into a string *)
+  (** Converts the menu [menu] into a string. *)
   let rec menu_to_string menu =
     let dish_to_string dish =
       dish.name ^ ": $" ^ string_of_float dish.price ^ "\n    ingredients: "
@@ -517,8 +546,8 @@ module Menus = struct
     | [] -> ""
     | h :: t -> dish_to_string h ^ menu_to_string t
 
-  (* prompts player to make their own menu, or select from the pre-determined
-     menus. *)
+  (** Prompts the user to make their own menu, or selects from the
+      pre-determined menus. *)
   let rec make_menu () =
     let input = read_line () in
     if input = "standard" then begin
@@ -573,6 +602,8 @@ module Menus = struct
       in
       set_dishes
 
+  (** A sequence of prompts for the user to set up the restaurant, including the
+      restaurant name, type, and menu. *)
   let set_up_restaurant () =
     Lwt_io.printl "Let's set up our restaurant!" >>= fun () ->
     Lwt_unix.sleep 2. >>= fun () ->
