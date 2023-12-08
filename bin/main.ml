@@ -21,46 +21,27 @@ let height = ref 0
 
 (* prints out the table list such that "table #'s coordinates are (#,
    #)(#,#)..." *)
+(* let keys : string = "\n\ \ Here are valid commands for the game: \n\ \ -
+   enter bar to get the size of the next party on queue \n\ \ - \"a\" to seat
+   the next party in queue \n\ \ - \"help\" to see the valid key commands \n\ \
+   - \"exit\" to quit the game \n"
 
-let keys : string =
-  "\n\
-  \ Here are valid commands for the game: \n\
-  \ - enter bar to get the size of the next party on queue \n\
-  \ - \"a\" to seat the next party in queue \n\
-  \ - \"help\" to see the valid key commands \n\
-  \ - \"exit\" to quit the game \n"
+   let rec read_int () = try int_of_string (read_line ()) with Failure _ ->
+   print_endline "Invalid input. Please enter an integer."; read_int () *)
 
-let rec read_int () =
-  try int_of_string (read_line ())
-  with Failure _ ->
-    print_endline "Invalid input. Please enter an integer.";
-    read_int ()
-
-let rec read_key () =
-  (* TODO: edit these instructions *)
-  print_string "Insert a command here: ";
-  (* TODO: implement "a" to seat ppl *)
-  let input = read_line () in
-  if input = "" then
-    (* TODO: call actual next queue party here *)
-    let party_size = 1 + Random.int 10 in
-    print_endline
-      ("Next in line is a party of " ^ string_of_int party_size ^ ".")
-    (* TODO: call read_key after re-printing key commands *)
-  else if input = "help" then
-    let _ = print_endline keys in
-    read_key ()
-  else if input = "exit" then exit 0
-  else (
-    print_endline "Please press enter or type \"exit\" to quit. ";
-    read_key ())
+(* let rec read_key () = (* TODO: edit these instructions *) print_string
+   "Insert a command here: "; (* TODO: implement "a" to seat ppl *) let input =
+   read_line () in if input = "" then (* TODO: call actual next queue party here
+   *) let party_size = 1 + Random.int 10 in print_endline ("Next in line is a
+   party of " ^ string_of_int party_size ^ ".") (* TODO: call read_key after
+   re-printing key commands *) else if input = "help" then let _ = print_endline
+   keys in read_key () else if input = "exit" then exit 0 else ( print_endline
+   "Please press enter or type \"exit\" to quit. "; read_key ()) *)
 
 let read_enter () =
   Lwt_io.read_line_opt Lwt_io.stdin >>= function
   | Some input -> if input = "" then Lwt.return () else exit 0
   | None -> exit 0
-
-(* let empty_restaurant size = Array.make size (ref "") *)
 
 let make_restaurant num_tables =
   (* sets width and height *)
@@ -167,7 +148,7 @@ let make_restaurant num_tables =
    around that table to represent the people in the party. [num_people] = the
    number of x's to place around the table [table_id] = the table to place the
    people at *)
-let fill_restaurant num_people table_id =
+let seat_party num_people table_id =
   if num_people > Table.capacity (get_table table_id) then
     failwith "too much people"
   else (
@@ -208,6 +189,62 @@ let setup_num_tables () =
   display_filled_restaurant ();
   Lwt.return ()
 
+(* prints out the table list such that "table #'s coordinates are (#,
+   #)(#,#)..." *)
+
+let keys : string =
+  "\n\
+  \ Here are valid commands for the game: \n\
+  \ - enter bar to get the size of the next party on queue \n\
+  \ - \"next\" to seat the next party in queue \n\
+  \ - \"help\" to see the valid key commands \n\
+  \ - \"exit\" to quit the game \n"
+
+let rec read_int () =
+  try int_of_string (read_line ())
+  with Failure _ ->
+    print_endline "Invalid input. Please enter an integer.";
+    read_int ()
+
+let rec read_key () =
+  (* TODO: edit these instructions *)
+  print_string "Insert a command here: ";
+  (* TODO: implement "a" to seat ppl *)
+  let input = read_line () in
+  if input = "next" then (
+    (* TODO: call actual next queue party here *)
+    let party_size = 1 + Random.int 10 in
+    print_endline
+      ("Next in line is a party of " ^ string_of_int party_size ^ ".");
+    Lwt_main.run
+      ( Lwt_unix.sleep 1. >>= fun () ->
+        Lwt_io.printl "Enter the table id at which to seat this party: \n "
+        >>=
+        let rec seat n =
+          let c = (get_table n).capacity in
+          if c < party_size then fun () ->
+            Lwt_io.printl
+              "Uh oh! That table is too small for this group. Try again~"
+          else if c > party_size + 2 then fun () ->
+            Lwt_io.printl
+              "That table has too many seats for this group! Try again~"
+            >>= fun () ->
+            Lwt_unix.sleep 2. >>= fun () -> seat (read_int ())
+          else fun () ->
+            Lwt_io.printl
+              "Great job! The customers are happy with their placement."
+            >>= fun () -> Lwt.return (seat_party party_size n)
+        in
+        seat (read_int ())
+        (* TODO: call read_key after re-printing key commands *) ))
+  else if input = "help" then
+    let _ = print_endline keys in
+    read_key ()
+  else if input = "exit" then exit 0
+  else (
+    print_endline "Please press enter or type \"exit\" to quit. ";
+    read_key ())
+
 (* running the game *)
 let () =
   Lwt_main.run
@@ -247,12 +284,14 @@ let () =
       Lwt_unix.sleep 1. >>= fun () ->
       Lwt_io.printl
         "\n\
-         You will be given a score based on how many parties you seat. \n\
-        \  You will lose if you seat too many parties at the wrong table size. \n\
+         You will be given a score based on how many parties you seat. You \
+         will lose if you seat too many parties at the wrong table size. \n\
         \  You will win if you seat all the parties in the queue. \n\
         \ Good luck! \n"
       >>= fun () ->
       Lwt_unix.sleep 2. >>= fun () -> setup_num_tables () );
+  (* fun () -> Lwt_unix.sleep 4. >>= fun () -> Lwt_io.printl " \n\n " >>= fun ()
+     -> Lwt_unix.sleep 2. >>= fun () -> read_enter () >>= fun () -> ); *)
   print_endline keys;
   read_key ();
 

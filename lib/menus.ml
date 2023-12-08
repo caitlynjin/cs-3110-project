@@ -32,7 +32,7 @@ let cuisine_list : string list =
     "Korean";
     "Spanish";
     "French";
-    "Greece";
+    "Greek";
     "Thai";
   ]
 
@@ -53,8 +53,7 @@ let spanish_dishes_suggestions =
 let french_dishes_suggestions =
   "Croissants, Baguettes, Ratatouille, Coq au Vin, Cassoulet"
 
-let greece_dishes_suggestions =
-  "Moussaka, Souvlaki, Gyros, Spanakopita, Baklava"
+let greek_dishes_suggestions = "Moussaka, Souvlaki, Gyros, Spanakopita, Baklava"
 
 let thai_dishes_suggestions =
   "Pad Thai, Tom Yum, Som Tum, Khao Pad, Massaman Curry"
@@ -332,7 +331,7 @@ let french_set_menu =
     };
   ]
 
-let greece_set_menu =
+let greek_set_menu =
   [
     {
       name = "Moussaka";
@@ -438,7 +437,7 @@ let rec read_key () =
   if
     input = "chinese" || input = "italian" || input = "american"
     || input = "indian" || input = "japanese" || input = "korean"
-    || input = "spanish" || input = "french" || input = "greece"
+    || input = "spanish" || input = "french" || input = "greek"
     || input = "thai"
   then begin
     cuisine := input;
@@ -471,7 +470,7 @@ let suggest_menus cuisine =
   else if cuisine = "korean" then korean_dishes_suggestions
   else if cuisine = "spanish" then spanish_dishes_suggestions
   else if cuisine = "french" then french_dishes_suggestions
-  else if cuisine = "greece" then greece_dishes_suggestions
+  else if cuisine = "greece" then greek_dishes_suggestions
   else if cuisine = "thai" then thai_dishes_suggestions
   else failwith "Invalid cuisine"
 
@@ -487,7 +486,7 @@ let set_menu input =
   else if input = "korean" then korean_set_menu
   else if input = "spanish" then spanish_set_menu
   else if input = "french" then french_set_menu
-  else if input = "greece" then greece_set_menu
+  else if input = "greece" then greek_set_menu
   else if input = "thai" then thai_set_menu
   else failwith "Invalid cuisine"
 
