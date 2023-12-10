@@ -34,12 +34,13 @@ let queue_tests =
        |> WaitlistQueue.enqueue 6 |> WaitlistQueue.enqueue 1
        |> WaitlistQueue.to_list) );
     ( "dequeue element from a nonempty queue" >:: fun _ ->
-      assert_equal (Some 3)
+      assert_equal
+        (3, [ 6; 1 ])
         (WaitlistQueue.empty |> WaitlistQueue.enqueue 3
        |> WaitlistQueue.enqueue 6 |> WaitlistQueue.enqueue 1
        |> WaitlistQueue.dequeue) );
     ( "dequeue element from an empty queue" >:: fun _ ->
-      assert_equal None (WaitlistQueue.empty |> WaitlistQueue.dequeue) );
+      assert_equal (-1, []) (WaitlistQueue.dequeue []) );
   ]
 
 let ready_table = ReadyTable.make 0 3

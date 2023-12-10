@@ -1,15 +1,37 @@
 open Table
+open Queue
 
 module Rest = struct
   type t = string ref array array ref
 
+  (* 2-D mutable string array to represent graphical restaurant layout. *)
   let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))
+
+  (* Mutable list to represent tables and their associated id numbers in
+     restaurant data structure. *)
   let table_list = ref []
+
+  (* Changes the symbol at coordinate pair (row, col) to [sym]. *)
   let set_coord_symbol row col sym = row.(col) <- ref sym
+
+  (* Adds a table to the current table list. *)
   let add_table_list id table = table_list := (id, table) :: !table_list
+
+  (* Returns the table associated with index [id]. *)
   let get_table id = List.assoc id !table_list
 
-  exception SizeError
+  (* Represents the current queue of parties waiting in line to be seated. *)
+  let queue = ref WaitlistQueue.empty
+
+  (* Initializes the queue to a random length between 1 and [n] * [n], where [n]
+     is the number of tables per row/column of the restaurant, given by the
+     user. *)
+  let initialize_queue n =
+    Random.self_init ();
+    for _ = 1 to 1 + Random.int (n * n) do
+      queue := WaitlistQueue.enqueue (1 + Random.int 3) !queue
+    done
+
   exception TableOccupied
   exception TableNotFound
 
@@ -27,6 +49,20 @@ module Rest = struct
           set_coord_symbol !restaurant_layout.(x) y sym
         done
     with Not_found -> raise TableNotFound
+
+  (** Resets the table [id] to its default state such that . This only changes
+      the appearance of the coordinates of the table, does not modify any other
+      aspects of the table *)
+  let reset_table id =
+    let table = get_table id in
+    let b1, b2 = List.nth (Table.coord_list table) 0 in
+    let t1, t2 = List.nth (Table.coord_list table) 3 in
+    let l1, l2 = List.nth (Table.coord_list table) 2 in
+    let r1, r2 = List.nth (Table.coord_list table) 1 in
+    set_coord_symbol !restaurant_layout.(b1) b2 "-";
+    set_coord_symbol !restaurant_layout.(t1) t2 "-";
+    set_coord_symbol !restaurant_layout.(r1) r2 "|";
+    set_coord_symbol !restaurant_layout.(l1) l2 "|"
 
   let width = ref 0
   let height = ref 0
@@ -54,7 +90,7 @@ module Rest = struct
         row.(i2) <- ref "|")
     in
 
-    (* creates the end of tables and adds coordiantes to each table in the
+    (* creates the end of tables and adds coordinates to each table in the
        list *)
     let create_table_end row width h =
       (row.(0) <- ref "|";
@@ -145,8 +181,7 @@ module Rest = struct
     done;
     (* where print queue starts *)
     print_string "Current Queue: ";
-    let queue_length = 5 + Random.int 10 in
-    for _ = 0 to queue_length do
+    for _ = 1 to WaitlistQueue.length !queue do
       print_string "* "
     done;
     print_endline "\n"
@@ -173,11 +208,9 @@ module Rest = struct
   let seat_party num_people table_id =
     try
       let table = get_table table_id in
-      if Table.isReady table then
-        if num_people > Table.capacity table then raise SizeError
-        else (
-          Table.seat table num_people;
-          change_seats_sym table_id num_people "*")
+      if Table.isReady table then (
+        Table.seat table num_people;
+        change_seats_sym table_id num_people "*")
       else raise TableOccupied
     with Not_found -> raise TableNotFound
 
@@ -185,7 +218,9 @@ module Rest = struct
       correspondinly around that table where people ('*') once were to represent
       the people in the party leaving and the table being cleared. [table_id] =
       the table to clear the people from *)
-  let finish_eating id = Table.finish (get_table id)
+  let finish_eating id =
+    Table.finish (get_table id);
+    reset_table id
 
   (** Modifies the corresponding table [id] to Ready *)
   let clean_table id = Table.clean (get_table id)
