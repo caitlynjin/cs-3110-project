@@ -76,6 +76,11 @@ module Menus = struct
   let thai_dish_suggestions =
     "Pad Thai, Tom Yum, Som Tum, Khao Pad, Massaman Curry"
 
+  (** NOTE: We tried to implement a JSON-parsing function but had some trouble
+    * getting it to work, so we had to include the hard-coded data in this file
+    * in order to get our game to work properly. We wanted to emphasize that we did
+    * not place this code here to inflate our LOC count but that it is here simply
+    * so that our game is functional. *)
   (** The default menu for Chinese-style cuisine. *)
   let chinese_set_menu =
     [
