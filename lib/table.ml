@@ -183,7 +183,6 @@ module DirtyTable : Table = struct
     coord_list : (int * int) list ref;
   }
 
-
   (** Makes a table with the Dirty state, a person capacity [c], and an empty
       coordinate list for the seating of people. *)
   let make p c =

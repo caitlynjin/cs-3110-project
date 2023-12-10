@@ -1,28 +1,13 @@
 open Table
 
-(** A model that lays out the restaurant user interface. *)
 module Rest = struct
   type t = string ref array array ref
-  (** Type representing the 2D array of tables. *)
 
-  (** The restaurant's layout, which is represented by a 2D array. *)
   let restaurant_layout = ref (Array.make 0 (Array.make 0 (ref "")))
-
-  (** The list of tables represented by a 2D array of table id's the table
-      itself. *)
   let table_list = ref []
-
-  (** Sets the symbol [sym] to the coordinate at row [row] and column [col]. *)
   let set_coord_symbol row col sym = row.(col) <- ref sym
-
-  (** Adds the table with the [id] to the list of tables [table_list]. *)
   let add_table_list id table = table_list := (id, table) :: !table_list
-
-  (** Gets the table with the corresponding [id] as [option]. *)
-  let get_table id = List.assoc_opt id !table_list
-
-  (** Gets the table with the corresponding [id]. *)
-  let get_act_table id = List.assoc id !table_list
+  let get_table id = List.assoc id !table_list
 
   exception SizeError
   exception TableOccupied
@@ -31,41 +16,22 @@ module Rest = struct
   (** Changes the first [n]th seats of the table [id] to the following symbol
       [sym]. *)
   let change_seats_sym id n sym =
-    match get_table id with
-    | Some table ->
-        if n > 4 then failwith ("Error" ^ string_of_int n)
-        else if List.length (Table.coord_list table) = 0 then
-          failwith "Error list is 0 "
-        else
-          for i = 0 to n - 1 do
-            let x, y = List.nth (Table.coord_list table) i in
-            set_coord_symbol !restaurant_layout.(x) y sym
-          done
-    | None -> raise TableNotFound
+    try
+      let table = get_table id in
+      if n > 4 then failwith ("Error" ^ string_of_int n)
+      else if List.length (Table.coord_list table) = 0 then
+        failwith "Error list is 0 "
+      else
+        for i = 0 to n - 1 do
+          let x, y = List.nth (Table.coord_list table) i in
+          set_coord_symbol !restaurant_layout.(x) y sym
+        done
+    with Not_found -> raise TableNotFound
 
-  (** Resets the table [id] to its default state such that . This only changes
-      the appearance of the coordinates of the table, does not modify any other
-      aspects of the table *)
-  let reset_table id =
-    match get_table id with
-    | Some table ->
-        let b1, b2 = List.nth (Table.coord_list table) 0 in
-        let t1, t2 = List.nth (Table.coord_list table) 3 in
-        let l1, l2 = List.nth (Table.coord_list table) 2 in
-        let r1, r2 = List.nth (Table.coord_list table) 1 in
-        set_coord_symbol !restaurant_layout.(b1) b2 "-";
-        set_coord_symbol !restaurant_layout.(t1) t2 "-";
-        set_coord_symbol !restaurant_layout.(r1) r2 "|";
-        set_coord_symbol !restaurant_layout.(l1) l2 "|"
-    | None -> raise TableNotFound
-
-  (** The width of the restaurant. *)
   let width = ref 0
-
-  (** The height of the restaurant. *)
   let height = ref 0
 
-  (** Creates a restaurant based on the set number of tables [num_tables]. *)
+  (* creates a restaurant based on the number of tables *)
   let make_restaurant num_tables =
     (* sets width and height *)
     width := (5 * num_tables) + (3 * (num_tables - 1)) + 8;
@@ -101,7 +67,7 @@ module Rest = struct
          row.(!i) <- ref " ";
          row.(!i + 1) <- ref "-";
          row.(!i + 2) <- ref "-";
-         Table.add_list (get_act_table !current_table) h (!i + 2);
+         Table.add_list (get_table !current_table) h (!i + 2);
          row.(!i + 3) <- ref "-";
          row.(!i + 4) <- ref " ";
          row.(!i + 5) <- ref " ";
@@ -126,12 +92,12 @@ module Rest = struct
          row.(!i) <- ref " ";
          row.(!i + 1) <- ref " ";
          row.(!i + 2) <- ref "|";
-         Table.add_list (get_act_table !current_table) h (!i + 2);
+         Table.add_list (get_table !current_table) h (!i + 2);
          row.(!i + 3) <- ref " ";
          row.(!i + 4) <- ref " ";
          row.(!i + 5) <- ref " ";
          row.(!i + 6) <- ref "|";
-         Table.add_list (get_act_table !current_table) h (!i + 6);
+         Table.add_list (get_table !current_table) h (!i + 6);
 
          row.(!i + 7) <- ref " ";
          i := !i + 8;
@@ -169,8 +135,6 @@ module Rest = struct
     generate_row !restaurant_layout.(!height - 2) 1 (!width - 1) (ref " ");
     generate_row !restaurant_layout.(!height - 1) 0 !width (ref "-")
 
-  (** Prints the restaurant including the people that may or may not be seated
-      in the restaurant. *)
   let display_filled_restaurant () =
     (* prints everything out *)
     for i = 0 to !height - 1 do
@@ -181,13 +145,14 @@ module Rest = struct
     done;
     (* where print queue starts *)
     print_string "Current Queue: ";
-    for _ = 0 to 5 + Random.int 10 do
+    let queue_length = 5 + Random.int 10 in
+    for _ = 0 to queue_length do
       print_string "* "
     done;
     print_endline "\n"
 
-  (** Prints out the table list such that "table #'s coordinates are (#,
-      #)(#,#)..." *)
+  (* prints out the table list such that "table #'s coordinates are (#,
+     #)(#,#)..." *)
   let print_list () =
     let print_coord acc (h, w) =
       acc ^ "(" ^ string_of_int h ^ ", " ^ string_of_int w ^ ")"
@@ -201,37 +166,29 @@ module Rest = struct
     in
     List.iter print_entry !table_list
 
-  (** Modifies the corresponding rows of table_id and place 'x's around that
-      table to represent the people in the party. [num_people] = the number of
-      x's to place around the table [table_id] = the table to place the people
-      at. *)
+  (* seat_party will modify the corresponding rows of table_id and place 'x's
+     around that table to represent the people in the party. [num_people] = the
+     number of x's to place around the table [table_id] = the table to place the
+     people at *)
   let seat_party num_people table_id =
-    match get_table table_id with
-    | Some table ->
-        if Table.isReady table then
-          if num_people > Table.capacity table then raise SizeError
-          else (
-            Table.seat table num_people;
-            change_seats_sym table_id num_people "*")
-        else raise TableOccupied
-    | None -> raise TableNotFound
+    try
+      let table = get_table table_id in
+      if Table.isReady table then
+        if num_people > Table.capacity table then raise SizeError
+        else (
+          Table.seat table num_people;
+          change_seats_sym table_id num_people "*")
+      else raise TableOccupied
+    with Not_found -> raise TableNotFound
 
   (** Modifies the corresponding rows of table_id and place '-'s or '|'s
       correspondinly around that table where people ('*') once were to represent
       the people in the party leaving and the table being cleared. [table_id] =
       the table to clear the people from *)
-  let finish_eating table_id =
-    match get_table table_id with
-    | Some table ->
-        Table.finish table;
-        reset_table table_id
-    | None -> failwith "Impossible"
+  let finish_eating id = Table.finish (get_table id)
 
   (** Modifies the corresponding table [id] to Ready *)
-  let clean_table id =
-    match get_table id with
-    | None -> ()
-    | Some x -> Table.clean x
+  let clean_table id = Table.clean (get_table id)
 
   (** returns the table list *)
   let get_table_list = !table_list

@@ -8,10 +8,9 @@ open Points
 
 let keys : string =
   "These are the valid commands for the game: \n\
-  \ - enter bar to get the size of the next party on queue \n\
   \ - \"next\" to seat the next party in queue \n\
   \ - \"help\" to see the valid key commands \n\
-  \ - \"exit\" to quit the game \n"
+  \ - \"exit\" to end the game \n"
 
 (** Reads the user input for an integer. If not, then console alerts that this
     is an invalid input and continues reading for user input until valid. *)
@@ -28,10 +27,8 @@ let rec read_int () =
 let rec read_key () =
   (* TODO: edit these instructions *)
   print_string "Enter a command here: ";
-  (* TODO: implement "a" to seat ppl *)
   let input = read_line () in
   if input = "next" then (
-    (* TODO: call actual next queue party here *)
     Random.self_init ();
     let party_size = 1 + Random.int 3 in
     let start_time = Unix.gettimeofday () in
@@ -40,12 +37,6 @@ let rec read_key () =
     print_endline
       "Which table number do you want to seat the party at? (starts from 1 and \
        increases across the row first, then goes down columns) ";
-    (* let rec seat n = let c = (Rest.get_table (n)).capacity in if c <
-       party_size then print_endline "Uh oh! That table is too small for this
-       group. Try again~"; seat (read_int ()) else if c > (party_size + 2) then
-       print_endline "That table has too many seats for this group! Try again~";
-       seat (read_int ()) else print_endline "Great job! The customers are happy
-       with their placement."; *)
     let rec seat n =
       try Rest.seat_party party_size n with
       | Rest.SizeError ->
@@ -54,25 +45,36 @@ let rec read_key () =
              one:";
           seat (read_int ())
       | Rest.TableOccupied ->
-          print_endline
-            "Oops, looks like that table hasn't been cleaned yet - try again:";
+          print_endline "Oops, looks like that table is occupied - try again:";
           seat (read_int ())
       | Rest.TableNotFound ->
           print_endline "That table doesn't exist! Try again:";
           seat (read_int ())
     in
     seat (read_int ());
-    print_endline "Great job! Your restaurant now looks like this: ";
     Rest.display_filled_restaurant ();
+    print_endline "Great job! Your updated restaurant is displayed above. ";
     Points.parties_points
-      (int_of_float (Unix.gettimeofday () -. start_time))
+      (int_of_float ~-.(Unix.gettimeofday () -. start_time))
       party_size;
     Points.show_points ();
     read_key ())
   else if input = "help" then
     let _ = print_endline keys in
     read_key ()
-  else if input = "exit" then exit 0
+  else if input = "exit" then
+    if Points.get_points () <> 0 then
+      let _ =
+        print_endline
+          ("Thanks for playing Dish Dash Dilemma! Your score is "
+          ^ string_of_int (Points.get_points ())
+          ^ ". See you again soon! \n\
+            \ 3110 Final Project FA2023: \n\
+            \  by: C. Jin, S. Pan,\n\
+            \   K. Sabile, S. Wang)")
+      in
+      exit 0
+    else exit 0
   else (
     print_endline
       "Invalid command. Type \"help\" to see the list of valid commands. ";
@@ -92,6 +94,7 @@ let setup_num_tables () =
     "First, enter the number of tables for the width and the height of the \
      restaurant: ";
   Rest.make_restaurant (read_int ());
+  print_endline "Your empty restaurant looks like this: ";
   Rest.display_filled_restaurant ();
 
   (* just for testing purposes *)
@@ -107,7 +110,7 @@ let () =
   Lwt_main.run
     ( Lwt_unix.sleep 1. >>= fun () ->
       Lwt_io.printl "\nWelcome to Dish Dash Dilemma!\n " >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () ->
+      Lwt_unix.sleep 1. >>= fun () ->
       Lwt_io.printl
         "In this game, you will be the host of a restaurant. \n\
         \ You are in charge of seating customers and making sure they are \
@@ -130,7 +133,7 @@ let () =
          You will be given a queue of parties waiting to be seated.\n\
         \ You must seat them in the restaurant at appropriate tables."
       >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () ->
+      Lwt_unix.sleep 5. >>= fun () ->
       Lwt_io.printl
         "\n\
         \  - If you seat them at a table that is too small, they will leave. \n\
@@ -138,7 +141,7 @@ let () =
         \  - If you seat them at a table that is not ready, they will leave. \n\
         \  - If you seat them at a table that is just right, they will stay!"
       >>= fun () ->
-      Lwt_unix.sleep 3. >>= fun () ->
+      Lwt_unix.sleep 10. >>= fun () ->
       Lwt_io.printl
         "\n\
          You will be given a score based on how many parties you seat. You \
@@ -146,14 +149,8 @@ let () =
         \  You will win if you seat all the parties in the queue. \n\
         \ Good luck! \n"
       >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () ->
+      Lwt_unix.sleep 7. >>= fun () ->
       setup_num_tables () >>= fun () ->
-      Lwt_unix.sleep 1. >>= fun () ->
+      Lwt_unix.sleep 2. >>= fun () ->
       Lwt_io.printl keys >>= fun () ->
-      Lwt_unix.sleep 2. >>= fun () -> Lwt.return (read_key ()) )
-
-(* TODO: uncomment this for end of game *)
-(* >>= fun () -> Lwt_unix.sleep 1. >>= fun () -> Lwt_io.printl "Thank you for
-   playing Dish Dash Dilemma!" >>= fun () -> Lwt_unix.sleep 1. >>= fun () ->
-   Lwt_io.printl "Goodbye! (3110 Final Project FA2023: \n\ \ by: C. Jin, S. Pan,
-   K. Sabile, S. Wang)" *)
+      Lwt_unix.sleep 7. >>= fun () -> Lwt.return (read_key ()) )

@@ -101,8 +101,7 @@
       "make_time": 7
     }
   ],
-  "american_set_menu" :
-    [
+  "american_set_menu": [
     {
       "name": "Burger",
       "price": 9.99,
@@ -154,8 +153,7 @@
       "make_time": 6
     }
   ],
-  "korean_set_menu" :
-    [
+  "korean_set_menu": [
     {
       "name": "Bibimbap",
       "price": 9.99,
@@ -207,8 +205,7 @@
       "make_time": 5
     }
   ],
-  "italian_set_menu" :
-    [
+  "italian_set_menu": [
     {
       "name": "Pasta",
       "price": 9.99,
@@ -260,8 +257,7 @@
       "make_time": 8
     }
   ],
-  "indian_set_menu" :
-    [
+  "indian_set_menu": [
     {
       "name": "Curry",
       "price": 9.99,
@@ -313,8 +309,7 @@
       "make_time": 8
     }
   ],
-  "spanish_set_menu" :
-    [
+  "spanish_set_menu": [
     {
       "name": "Paella",
       "price": 9.99,
@@ -365,8 +360,7 @@
       "make_time": 7
     }
   ],
-  "french_set_menu" :
-    [
+  "french_set_menu": [
     {
       "name": "Croissants",
       "price": 9.99,
@@ -418,8 +412,7 @@
       "make_time": 7
     }
   ],
-  "greek_set_menu" :
-    [
+  "greek_set_menu": [
     {
       "name": "Moussaka",
       "price": 9.99,
@@ -469,8 +462,7 @@
       "make_time": 7
     }
   ],
-  "thai_set_menu" :
-    [
+  "thai_set_menu": [
     {
       "name": "Pad Thai",
       "price": 9.99,
