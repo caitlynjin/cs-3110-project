@@ -12,11 +12,12 @@ module WaitlistQueue = struct
   (** Adds the new party's party size to the queue. *)
   let enqueue (party : int) (q : t) = q @ [ party ]
 
-  (** Removes the first party in the queue and returns the party's size. *)
-  let dequeue (q : t) : int option =
+  (** Removes the first party in the queue and returns a pair with the party's
+      size as the first element and the resulting queue as the second element. *)
+  let dequeue (q : t) : int * t =
     match q with
-    | [] -> None
-    | h :: _ -> Some h
+    | [] -> (-1, [])
+    | h :: t -> (h, t)
 
   (** Converts the waitlist queue into a list. *)
   let to_list (q : t) : int list = q

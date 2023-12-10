@@ -49,7 +49,7 @@ module Menus = struct
   let japanese_dish_suggestions = "Sushi, Ramen, Udon, Tempura, Sashimi"
 
   (** A string of suggestions for American style dishes. *)
-  let american_dish_suggestions = "Burgers, Steaks, Sandwiches, Fries, Pizza"
+  let american_dish_suggestions = "Burger, Steak, Sandwich, Fries, Pizza"
 
   (** A string of suggestions for Italian style dishes. *)
   let italian_dish_suggestions = "Pasta, Pizza, Risotto, Lasagna, Gnocchi"
@@ -92,7 +92,7 @@ module Menus = struct
         make_time = 6;
       };
       {
-        name = "Noodles";
+        name = "Lo Mein";
         price = 7.99;
         ingredients = [ "Noodles"; "Meat"; "Vegetables" ];
         make_time = 7;
@@ -129,7 +129,7 @@ module Menus = struct
       {
         name = "Lumpia";
         price = 8.99;
-        ingredients = [ "Noodles"; "Meat"; "Vegetables" ];
+        ingredients = [ "Wrappers"; "Meat"; "Vegetables" ];
         make_time = 7;
       };
       {
@@ -170,7 +170,7 @@ module Menus = struct
       {
         name = "Tempura";
         price = 4.99;
-        ingredients = [ "Batter"; "Vegetables" ];
+        ingredients = [ "Batter"; "Shrimp"; "Vegetables" ];
         make_time = 5;
       };
       {
@@ -187,7 +187,7 @@ module Menus = struct
       {
         name = "Burger";
         price = 9.99;
-        ingredients = [ "Bun"; "Meat"; "Vegetables" ];
+        ingredients = [ "Bun"; "Patty"; "Cheese" ];
         make_time = 5;
       };
       {
@@ -205,13 +205,13 @@ module Menus = struct
       {
         name = "Fries";
         price = 4.99;
-        ingredients = [ "Potatoes"; "Sauce"; "Vegetables" ];
+        ingredients = [ "Potatoes"; "Salt"; "Oil" ];
         make_time = 3;
       };
       {
         name = "Pizza";
         price = 10.99;
-        ingredients = [ "Dough"; "Sauce"; "Vegetables" ];
+        ingredients = [ "Dough"; "Sauce"; "Cheese" ];
         make_time = 6;
       };
     ]
@@ -257,25 +257,25 @@ module Menus = struct
       {
         name = "Pasta";
         price = 9.99;
-        ingredients = [ "Pasta"; "Sauce"; "Vegetables" ];
+        ingredients = [ "Pasta"; "Sauce"; "Cheese" ];
         make_time = 8;
       };
       {
         name = "Pizza";
         price = 12.99;
-        ingredients = [ "Dough"; "Sauce"; "Vegetables" ];
+        ingredients = [ "Dough"; "Sauce"; "Cheese" ];
         make_time = 12;
       };
       {
         name = "Risotto";
         price = 7.99;
-        ingredients = [ "Rice"; "Sauce"; "Vegetables" ];
+        ingredients = [ "Rice"; "Broth"; "Vegetables" ];
         make_time = 8;
       };
       {
         name = "Lasagna";
         price = 4.99;
-        ingredients = [ "Pasta"; "Sauce"; "Vegetables" ];
+        ingredients = [ "Pasta"; "Sauce"; "Cheese" ];
         make_time = 15;
       };
       {
@@ -475,7 +475,9 @@ module Menus = struct
   (** Reads user input for the name of the restaurant. Modifies the name of the
       restaurant to the user input. *)
   let name_res () =
-    print_endline "What would you like to name your restaurant?";
+    print_endline
+      "What would you like to name your restaurant? (Enter a name, then press \
+       the enter key.)";
     let input = read_line () in
     restaurant_name := input;
     print_endline ("\n Your restaurant is called " ^ input ^ "! \n");
@@ -512,14 +514,14 @@ module Menus = struct
       print_endline (cuisine_announcement ^ !cuisine ^ ". \n");
       Lwt_unix.sleep 1.
     end
-    else if input = "random" then begin
+    else if input = "Random" then begin
       let random_cuisine =
         Random.self_init ();
         List.nth cuisine_list (Random.int (List.length cuisine_list))
       in
       cuisine := random_cuisine;
       print_endline (cuisine_announcement ^ !cuisine ^ ".");
-      Lwt_unix.sleep 2.
+      Lwt_unix.sleep 1.
     end
     else if input = "exit" then Lwt.return (exit 0)
     else begin
@@ -696,22 +698,19 @@ module Menus = struct
        ("Name: " ^ dish.name ^ "Price: " ^ string_of_float dish.price ^
        "\nIngredients: " ^ String.concat ", " dish.ingredients ^ "\nMake Time: "
        ^ string_of_int dish.make_time ^ "\n\n")) menu; *)
-    Lwt_io.printl "Let's set up our restaurant!" >>= fun () ->
+    Lwt_io.printl "Let's set up your restaurant!" >>= fun () ->
     Lwt_unix.sleep 1. >>= fun () ->
     name_res () >>= fun () ->
     read_key () >>= fun () ->
     Lwt_unix.sleep 2. >>= fun () ->
     Lwt_io.printl
-      "Now, let's make the menu! What dishes do you want to serve to your \
-       customers?"
-    >>= fun () ->
-    Lwt_io.printl
-      "  Or, type 'suggest' to see some suggestions of dishes to add, or \
-       'standard' to use a pre-determined menu. \n"
+      "Now, let's make the menu! Enter the name of a dish below, or type \
+       \"suggest\" to see some suggestions of dishes to add, or \"standard\" \
+       to use a pre-determined menu. \n"
     >>= fun () ->
     Lwt_unix.sleep 1. >>= fun () ->
     make_menu () >>= fun () ->
-    Lwt_unix.sleep 2. >>= fun () ->
+    Lwt_unix.sleep 4. >>= fun () ->
     let menu_str = menu_to_string !restaurant_menu in
     Lwt_io.printl "\nYour full menu is:" >>= fun () ->
     Lwt_unix.sleep 1. >>= fun () ->
